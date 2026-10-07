@@ -1,0 +1,30 @@
+- id: ch8-somme
+  type: numeric
+  prompt: "Combien vaut $1 + 2 + \\cdots + 100$ ?"
+  answer: 5050
+  explanation: "Par la formule démontrée : $\\frac{100 \\times 101}{2} = 5050$."
+  verify: {check: python_expr, expr: "sum(range(1, 101))"}
+- id: ch8-erreurs
+  type: qcm
+  multi: true
+  prompt: "Quelles rédactions d'hérédité sont **incorrectes** ?"
+  options:
+    - text: "« Supposons que $\\forall n \\in \\mathbb{N},\\ P(n)$. Montrons $P(n+1)$. »"
+      correct: true
+      why: "C'est supposer exactement ce qu'on veut démontrer. L'hypothèse porte sur **un** $n$ fixé."
+    - text: "« Soit $n \\ge n_0$ tel que $P(n)$ est vraie. Montrons $P(n+1)$. »"
+      why: "C'est la rédaction correcte."
+    - text: "« Supposons $P(n+1)$ vraie, et déduisons-en $P(n)$. »"
+      correct: true
+      why: "C'est le sens inverse : il faut aller de $P(n)$ vers $P(n+1)$."
+    - text: "« Vérifions $P(0)$, $P(1)$, $P(2)$ et $P(3)$ : la propriété est donc vraie pour tout $n$. »"
+      correct: true
+      why: "Quelques cas ne prouvent rien : c'est la « loi des petits nombres » (chapitre 13). Il manque l'hérédité."
+    - text: "« Soit $n \\ge 1$ tel que $P(n)$ est vraie. Alors, en utilisant $P(n)$, on obtient $P(n+1)$. »"
+      why: "Correct, à condition que l'initialisation soit faite en $n_0 = 1$ et que l'argument marche dès $n = 1$."
+- id: ch8-rang
+  type: numeric
+  prompt: "Quel est le plus petit entier $n_0 \\ge 1$ tel que $2^n \\ge n^2$ pour **tout** $n \\ge n_0$ ?"
+  answer: 4
+  explanation: "$2^1 \\ge 1$ et $2^2 \\ge 4$, mais $2^3 = 8 < 9$ : la propriété échoue en $n = 3$, donc $n_0 \\ge 4$. Et elle est vraie pour tout $n \\ge 4$ (entraînement 3)."
+  verify: {check: python_expr, expr: "next(n0 for n0 in range(1, 50) if all(2 ** n >= n * n for n in range(n0, 400)))"}

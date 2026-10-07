@@ -166,3 +166,33 @@ def test_ch7_intersection_equality_iff_injective():
             injective = folo.is_injection(lambda x: f[x], set(E), set(F))
             equality = all(_direct_image(f, A & B) == _direct_image(f, A) & _direct_image(f, B) for A in PE for B in PE)
             assert injective == equality
+
+
+# ---------- Ch8 : formules et contre-exemples de récurrence ----------
+import math
+
+
+def test_ch8_sum_formulas():
+    for n in range(1, 500):
+        assert sum(range(1, n + 1)) == n * (n + 1) // 2
+        assert sum(k * k for k in range(1, n + 1)) * 6 == n * (n + 1) * (2 * n + 1)
+        assert sum(2 * k - 1 for k in range(1, n + 1)) == n * n
+        assert 2 * n * n + 7 * n + 6 == (n + 2) * (2 * n + 3)
+
+
+def test_ch8_sin_inequality_numerically():
+    for n in range(1, 30):
+        for i in range(-300, 301):
+            x = i / 37
+            assert abs(math.sin(n * x)) <= n * abs(math.sin(x)) + 1e-9
+
+
+def test_ch8_nine_divides_ten_power_plus_one_never():
+    assert all((10 ** n + 1) % 9 == 2 for n in range(1, 200))
+    # l'hérédité était juste : 10^(n+1) + 1 = 10 (10^n + 1) - 9
+    assert all(10 ** (n + 1) + 1 == 10 * (10 ** n + 1) - 9 for n in range(50))
+
+
+def test_ch8_divisibility_and_powers():
+    assert all((n ** 3 - n) % 3 == 0 for n in range(1000))
+    assert all(2 ** n >= n * n for n in range(4, 500)) and 2 ** 3 < 9
