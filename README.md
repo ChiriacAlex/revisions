@@ -15,7 +15,7 @@ SESSION_SECRET=…   # >= 32 caractères : openssl rand -base64 48
 ## Lancer en permanence sur le Mac (Docker + nginx)
 
 ```bash
-docker compose up -d --build     # http://localhost:3217
+docker compose up -d --build     # http://revisions.localhost (ou http://localhost:3217)
 ```
 
 Deux conteneurs : `app` (serveur Next autonome) et `nginx` devant (compression, cache de Python/Pyodide).
