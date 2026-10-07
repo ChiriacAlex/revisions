@@ -1,12 +1,11 @@
-/* Exécute le code Python de l'étudiant + les tests unittest dans un Web Worker (Pyodide). */
-const PYODIDE_URL = "https://cdn.jsdelivr.net/pyodide/v314.0.7/full/";
+/* Exécute le code Python de l'étudiant + les tests unittest dans un Web Worker module (Pyodide). */
+import { loadPyodide } from "/vendor/pyodide/pyodide.mjs";
+
+const PYODIDE_URL = self.location.origin + "/vendor/pyodide/";
 let pyodideReady = null;
 
 function boot() {
-  if (!pyodideReady) {
-    importScripts(PYODIDE_URL + "pyodide.js");
-    pyodideReady = self.loadPyodide({ indexURL: PYODIDE_URL });
-  }
+  if (!pyodideReady) pyodideReady = loadPyodide({ indexURL: PYODIDE_URL });
   return pyodideReady;
 }
 

@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "content": "tsx scripts/build-content.ts",
+    "content": "node scripts/copy-pyodide.mjs && tsx scripts/build-content.ts",
     "dev": "npm run content && next dev",
     "build": "npm run content && next build",
     "start": "next start",
@@ -20,6 +20,7 @@
     "jose": "^6.2.12",
     "katex": "^0.16.47",
     "next": "16.4.0",
+    "pyodide": "^314.0.7",
     "react": "19.3.0",
     "react-dom": "19.3.0",
     "rehype-katex": "^7.0.1",

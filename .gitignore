@@ -60,3 +60,6 @@ __pycache__/
 
 # outils locaux
 /.claude/
+
+# runtime Python copié depuis node_modules (npm run content)
+/public/vendor/pyodide/

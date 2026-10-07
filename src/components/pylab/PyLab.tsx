@@ -8,6 +8,8 @@ import { summarize, type TestResult } from "@/lib/pylab";
 import { readStored, writeStored } from "@/lib/storage";
 
 const TIMEOUT_MS = 60_000;
+// À incrémenter à chaque modification de public/pyodide-worker.js (contourne le cache du navigateur).
+const WORKER_VERSION = 3;
 
 type RunState =
   | { phase: "idle" }
@@ -53,7 +55,7 @@ export function PyLab({ lab }: { lab: PyLabData }) {
   );
 
   const run = () => {
-    if (!workerRef.current) workerRef.current = new Worker("/pyodide-worker.js");
+    if (!workerRef.current) workerRef.current = new Worker(`/pyodide-worker.js?v=${WORKER_VERSION}`, { type: "module" });
     const worker = workerRef.current;
     const started = performance.now();
     const runId = Math.random().toString(36).slice(2);
