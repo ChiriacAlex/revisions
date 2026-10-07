@@ -291,3 +291,31 @@ def test_ch11_sum_of_binomials_and_inclusion_exclusion():
 def test_ch11_delegates():
     assert len([(d, s) for d in range(30) for s in range(30) if d != s]) == 870
     assert comb(30, 3) == 4060
+
+
+# ---------- Ch12 ----------
+from itertools import permutations
+
+
+def test_ch12_equations():
+    assert [x for x in (1, -2) if abs((2 - x) ** 0.5 - x) < 1e-12] == [1]
+    assert [x for x in (1, -2) if (x + 3) >= 0 and abs((x + 3) ** 0.5 - (x + 1)) < 1e-12] == [1]
+    f = lambda x: -x
+    assert all(f(x) + 2 * f(-x) == x for x in range(-50, 51))
+
+
+def test_ch12_subsets_containing_A_bijection():
+    E = frozenset(range(6))
+    A = frozenset({0, 2})
+    P_A = {X for X in _powerset(E) if A <= X}
+    P_rest = set(_powerset(E - A))
+    phi = lambda X: X - A
+    psi = lambda Y: Y | A
+    assert all(phi(X) in P_rest for X in P_A) and all(psi(Y) in P_A for Y in P_rest)
+    assert all(psi(phi(X)) == X for X in P_A) and all(phi(psi(Y)) == Y for Y in P_rest)
+    assert len(P_A) == 2 ** (len(E) - len(A))
+
+
+def test_ch12_bijections_count_n_factorial():
+    for n in range(1, 7):
+        assert len(list(permutations(range(n)))) == math.factorial(n)
