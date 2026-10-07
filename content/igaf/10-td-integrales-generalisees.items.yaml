@@ -1,0 +1,26 @@
+- id: tdig-comparaison
+  type: truefalse
+  prompt: "Nature des intégrales de la question 1-4. Vrai ou faux ?"
+  statements:
+    - text: "$\\int_1^{+\\infty}\\frac{e^{\\sin t}}{t}\\,dt$ converge."
+      answer: false
+      why: "Minoration : $\\frac{e^{\\sin t}}{t} \\ge \\frac{1}{e\\,t}$, et $\\int_1^{+\\infty}\\frac{dt}{t}$ diverge."
+    - text: "$\\int_\\pi^{+\\infty}\\frac{dt}{t + e^t}$ converge."
+      answer: true
+      why: "$\\frac{1}{t + e^t} \\sim e^{-t}$ en $+\\infty$."
+      verify: {check: python_expr, expr: "abs(calc.limit('exp(x)/(x+exp(x))', 'oo') - 1) < 1e-12"}
+    - text: "$\\int_0^{+\\infty}\\frac{\\ln t}{t^2}\\,dt$ converge."
+      answer: false
+      why: "En $0$, $\\int_\\varepsilon^1 \\frac{\\ln t}{t^2}\\,dt = -1 + \\frac{1 + \\ln\\varepsilon}{\\varepsilon} \\to -\\infty$."
+      verify: {check: python_expr, expr: "not (calc.antiderivative_ok('log(x)/x**2', '-(log(x)+1)/x') and calc.limit('-(log(x)+1)/x', 0, '+') == float('inf'))"}
+    - text: "$\\int_0^{+\\infty}\\frac{\\ln(1 + x^2)}{x^2}\\,dx = \\pi$"
+      answer: true
+      why: "Elle converge (fausse impropreté en $0$, $o(x^{-3/2})$ en $+\\infty$) ; par IPP on trouve $2\\int_0^{+\\infty}\\frac{dx}{1 + x^2} = \\pi$."
+      verify: {check: python_expr, expr: "abs(calc.integral('log(1+x**2)/x**2', 0, 'oo', breakpoints=(1,)) - calc.value('pi')) < 1e-8"}
+- id: tdig-calculs
+  type: numeric
+  prompt: "Calculer $\\int_0^{+\\infty}\\frac{3 + 2x^2}{(1 + x^2)(2 + x^2)}\\,dx$ (décimal à $10^{-3}$)."
+  answer: 2.6815171
+  tolerance: 0.001
+  explanation: "$\\frac{3 + 2x^2}{(1 + x^2)(2 + x^2)} = \\frac{1}{1 + x^2} + \\frac{1}{2 + x^2}$, d'où $\\frac{\\pi}{2} + \\frac{\\pi}{2\\sqrt{2}} \\approx 2{,}682$."
+  verify: {check: python_expr, expr: "calc.integral('(3+2*x**2)/((1+x**2)*(2+x**2))', 0, 'oo')"}

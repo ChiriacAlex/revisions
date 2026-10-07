@@ -1,0 +1,20 @@
+- id: meth-choix
+  type: qcm
+  prompt: "Pour montrer que $\\int_1^{+\\infty}\\frac{\\sin x}{x}\\,dx$ converge, quelle méthode fonctionne ?"
+  options:
+    - text: Convergence absolue
+      why: "$\\int_1^{+\\infty}\\frac{|\\sin x|}{x}\\,dx$ diverge : on ne peut pas conclure ainsi."
+    - text: "Intégration par parties sur $[1, A]$, puis limite"
+      correct: true
+      why: "$\\left[-\\frac{\\cos x}{x}\\right]_1^A - \\int_1^A \\frac{\\cos x}{x^2}\\,dx$ : terme de bord convergent, et intégrale absolument convergente."
+    - text: "Équivalent $\\frac{\\sin x}{x} \\sim \\frac{1}{x}$"
+      why: "C'est faux en $+\\infty$ ($\\sin x$ ne tend pas vers $1$), et la comparaison exige un signe constant."
+    - text: "Minoration par $\\frac{1}{x}$"
+      why: "$\\frac{\\sin x}{x} \\ge \\frac{1}{x}$ est faux, et une minoration sert à prouver une divergence."
+- id: meth-valeurs
+  type: numeric
+  prompt: "Calculer $\\int_0^1 \\frac{\\ln x}{(1 + x)^2}\\,dx$ (décimal à $10^{-3}$)."
+  answer: -0.6931472
+  tolerance: 0.001
+  explanation: "IPP avec la primitive $\\frac{x}{1 + x}$ de $\\frac{1}{(1 + x)^2}$ : $\\left[\\frac{x\\ln x}{1 + x}\\right]_0^1 - \\int_0^1 \\frac{dx}{1 + x} = -\\ln 2$."
+  verify: {check: python_expr, expr: "calc.integral('log(x)/(1+x)**2', 0, 1)"}

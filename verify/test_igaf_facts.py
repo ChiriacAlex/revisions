@@ -295,3 +295,87 @@ def test_dl_limits_and_equivalents():
     for f, g in [("sin(x)", "x"), ("log(1+x)", "x"), ("1-cos(x)", "x**2/2"), ("cosh(x)-1", "x**2/2"),
                  ("exp(x)-1-x", "x**2/2"), ("sin(x)-x", "-x**3/6"), ("(1+x)**Rational(1,3)-1", "x/3")]:
         assert limit(f"({f})/({g})", 0) == pytest.approx(1)
+
+
+# ---------- Ch3 — Intégrales généralisées et méthodes ----------
+@pytest.mark.parametrize("f,a,b,value", [
+    ("exp(-x)", 0, "oo", 1),
+    ("1/(4-x)**Rational(1,2)", 0, 4, 4),
+    ("1/x**Rational(3,2)", 1, "oo", 2),
+    ("1/(1+x**2)", 0, "oo", math.pi / 2),
+    ("1/x**2", 1, "oo", 1),  # ∫ₑ^∞ dx/(x ln²x) après u = ln x (la quadrature directe converge trop lentement)
+    ("log(x)/x**2", 1, "oo", 1),
+    ("x*exp(-x)", 0, "oo", 1),
+    ("x*exp(-2*x)", 0, "oo", 1 / 4),
+    ("log(x)", 0, 1, -1),
+    ("log(x)/(1+x)**2", 0, 1, -math.log(2)),
+    ("log(x)/sqrt(1-x)", 0, 1, 4 * math.log(2) - 4),
+    ("exp(-x)*sin(x)", 0, "oo", 1 / 2),
+    ("(1+x+x**2)*exp(-x)", 0, "oo", 4),
+    ("exp(-x**2)", 0, "oo", math.sqrt(math.pi) / 2),
+    ("x*log(x)/(1+x**2)**2", 0, "oo", 0),
+    ("log(sin(x))", 0, "pi/2", -math.pi / 2 * math.log(2)),
+    ("1/sqrt((x-1)*(2-x))", 1, 2, math.pi),
+    ("1/((1+x)*sqrt(x))", 0, 1, math.pi / 2),
+    ("1/((1+x)*sqrt(x))", 1, "oo", math.pi / 2),
+    ("1/sqrt(x)", 0, 4, 4),
+    ("x**(-Rational(1,3))", 0, 1, 1.5),
+])
+def test_improper_integral_values(f, a, b, value):
+    assert integral(f, a, b) == pytest.approx(value, abs=1e-9)
+
+
+@pytest.mark.parametrize("f,g,at,side", [
+    ("(x+1)/(x**3+2)", "1/x**2", "oo", None),
+    ("(1-cos(x))/x**3", "1/(2*x)", 0, "+"),
+    ("(exp(1/x)-cos(1/x))/x", "1/x**2", "oo", None),
+    ("1/(1-cos(x))**Rational(1,3)", "2**Rational(1,3)/x**Rational(2,3)", 0, "+"),
+    ("1/(x**2*(x**3-8)**Rational(2,3))", "1/(4*12**Rational(2,3)*(x-2)**Rational(2,3))", 2, "+"),
+    ("sqrt(x)/log(1+x)*sin(1/x**2)", "1/(x**Rational(3,2)*log(x))", "oo", None),
+    ("(cbrt(x+1)-cbrt(x+2))/sqrt(x)", "-1/(3*x**Rational(7,6))", "oo", None),
+    ("1/(cbrt(x)*sqrt(1-x**3)*log(1+x))", "1/x**Rational(4,3)", 0, "+"),
+    ("1/sqrt(x*tan(x))", "1/x", 0, "+"),
+    ("1/sqrt(x**3-1)", "1/(sqrt(3)*sqrt(x-1))", 1, "+"),
+    ("log(x+1)/sin(x-1)**2", "log(2)/(x-1)**2", 1, "+"),
+    ("1/sqrt(x**3+x**2)", "1/x", 0, "+"),
+])
+def test_equivalents_used_in_convergence_proofs(f, g, at, side):
+    assert limit(f"({f})/({g})", at, side) == pytest.approx(1)
+
+
+def test_slowly_convergent_bertrand_integral_by_primitive():
+    # primitive −1/ln x : vaut −1 en x = e et tend vers 0 en +∞, donc ∫ₑ^∞ = 1
+    assert antiderivative_ok("1/(x*log(x)**2)", "-1/log(x)", points=(2.9, 5, 30))
+    assert limit("-1/log(x)", "oo") == 0
+
+
+def test_divergent_bertrand_integral():
+    assert antiderivative_ok("1/(x*log(x))", "log(log(x))", points=(2.5, 4, 9))
+    assert limit("log(log(x))", "oo") == math.inf
+
+
+# ---------- TD 2 — Intégrales généralisées ----------
+def test_td_improper_integrals():
+    for alpha in (0.5, 2.0):
+        assert integral(f"exp(-{alpha}*x)", 0, "oo") == pytest.approx(1 / alpha)
+        assert integral(f"exp({alpha}*x)", "-oo", 0) == pytest.approx(1 / alpha)  # et non −1/α
+    assert integral("x**(-Rational(5,4))", 1, "oo") == pytest.approx(4)
+    assert integral("log(x)*exp(-x)", 0, "oo", breakpoints=(1,)) == pytest.approx(-0.5772156649015329)
+    assert integral("log(1+x**2)/x**2", 0, "oo", breakpoints=(1,)) == pytest.approx(math.pi)
+    assert integral("1/(2+x**2)", 0, "oo") == pytest.approx(math.pi / (2 * math.sqrt(2)))
+    assert identity("(3+2*x**2)/((1+x**2)*(2+x**2))", "1/(1+x**2)+1/(2+x**2)")
+    assert integral("(3+2*x**2)/((1+x**2)*(2+x**2))", 0, "oo") == pytest.approx(math.pi * (2 + math.sqrt(2)) / 4)
+    for lam in (0.5, 2.0):
+        assert integral(f"{lam}*exp(-{lam}*x)", 0, "oo") == pytest.approx(1)
+        assert integral(f"x*{lam}*exp(-{lam}*x)", 0, "oo") == pytest.approx(1 / lam)
+        assert integral(f"x**2*{lam}*exp(-{lam}*x)", 0, "oo") - lam ** -2 == pytest.approx(1 / lam ** 2)
+    A, a, w = 1.3, 0.7, 2.1
+    energy = integral(f"({A}*exp(-{a}*x)*cos({w}*x))**2", 0, "oo")
+    assert energy == pytest.approx(A ** 2 / (4 * a) + A ** 2 * a / (4 * (a * a + w * w)))
+
+
+def test_fresnel_value():
+    import mpmath
+    mpmath.mp.dps = 20
+    value = mpmath.quadosc(lambda t: mpmath.cos(t * t), [0, mpmath.inf], zeros=lambda n: mpmath.sqrt(mpmath.pi * (n - 0.5)))
+    assert float(value) == pytest.approx(0.5 * math.sqrt(math.pi / 2), rel=1e-8)

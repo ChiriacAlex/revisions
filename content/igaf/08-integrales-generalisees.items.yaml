@@ -1,0 +1,67 @@
+- id: ig-nature
+  type: qcm
+  multi: true
+  prompt: "Lesquelles sont des intégrales **généralisées** (impropres) ?"
+  options:
+    - text: "$\\int_0^1 \\frac{dx}{\\sqrt{x}}$"
+      correct: true
+      why: "$\\frac{1}{\\sqrt{x}}$ n'est pas bornée au voisinage de $0$."
+    - text: "$\\int_{-1}^{1} f(x)\\,dx$ avec $f(x) = 1$ si $x \\ne 0$ et $f(0) = 2$"
+      why: "$f$ est bornée et continue par morceaux sur un segment : intégrale ordinaire (qui vaut $2$)."
+    - text: "$\\int_0^{+\\infty} x^2\\,dx$"
+      correct: true
+      why: "Borne infinie (et l'intégrale diverge)."
+    - text: "$\\int_{-1}^{1} |x|\\,dx$"
+      why: "Fonction continue sur un segment : intégrale ordinaire, égale à $1$."
+    - text: "$\\int_{-\\pi}^{\\pi} \\tan x\\,dx$"
+      correct: true
+      why: "$\\tan$ n'est pas bornée près de $\\pm\\frac{\\pi}{2}$, points intérieurs : intégrale généralisée (divergente)."
+- id: ig-reference
+  type: truefalse
+  prompt: "Nature des intégrales (Wooclaps 3, 4 et 7 du cours). Vrai ou faux ?"
+  statements:
+    - text: "$\\int_1^{+\\infty} \\frac{dx}{\\sqrt{x^{7/5}}}$ converge."
+      answer: false
+      why: "$\\sqrt{x^{7/5}} = x^{7/10}$ et $\\alpha = \\frac{7}{10} \\le 1$ : divergente en $+\\infty$."
+    - text: "$\\int_0^4 \\frac{dx}{\\sqrt{x}} = 4$"
+      answer: true
+      why: "$\\big[2\\sqrt{x}\\big]_0^4 = 4$ (Riemann $\\alpha = \\frac{1}{2} < 1$ en $0$)."
+      verify: {check: python_expr, expr: "abs(calc.integral('1/sqrt(x)', 0, 4) - 4) < 1e-9"}
+    - text: "$\\int_\\pi^{+\\infty} \\frac{dx}{x^{2e/5}}$ converge."
+      answer: true
+      why: "$\\frac{2e}{5} \\approx 1{,}087 > 1$."
+      verify: {check: python_expr, expr: "2 * calc.value('E') / 5 > 1"}
+    - text: "$\\int_0^1 \\frac{dx}{x^{1/3}}$ converge."
+      answer: true
+      why: "Riemann en $0$ avec $\\alpha = \\frac{1}{3} < 1$ (elle vaut $\\frac{3}{2}$)."
+      verify: {check: python_expr, expr: "abs(calc.integral('x**(-Rational(1,3))', 0, 1) - 1.5) < 1e-9"}
+    - text: "$\\int_2^{+\\infty} \\frac{dx}{x\\ln x}$ converge."
+      answer: false
+      why: "Bertrand avec $\\alpha = 1$, $\\beta = 1$ : divergente. Une primitive est $\\ln(\\ln x) \\to +\\infty$."
+      verify: {check: python_expr, expr: "not (calc.antiderivative_ok('1/(x*log(x))', 'log(log(x))', points=(2.5, 4, 9)) and calc.limit('log(log(x))', 'oo') == float('inf'))"}
+- id: ig-comparaison
+  type: truefalse
+  prompt: Vrai ou faux ?
+  statements:
+    - text: "Si $f$ est continue sur $[a, +\\infty[$ et $f(x) \\to 0$, alors $\\int_a^{+\\infty} f$ converge."
+      answer: false
+      why: "Contre-exemple : $\\frac{1}{x}$ sur $[1, +\\infty[$."
+    - text: "$\\int_0^{+\\infty}\\sin t\\,dt$ converge car $\\int_0^x \\sin t\\,dt = 1 - \\cos x$ est bornée."
+      answer: false
+      why: "Le critère « bornée ⟹ converge » exige $f \\ge 0$. Ici $1 - \\cos x$ n'a pas de limite : divergence."
+    - text: "Si $0 \\le f \\le g$ et $\\int g$ diverge, alors $\\int f$ diverge."
+      answer: false
+      why: "Seul le sens « petit divergent ⟹ grand divergent » est valable. Exemple : $\\frac{1}{x^2} \\le 1$ sur $[1, +\\infty[$."
+    - text: "$\\int_1^{+\\infty}\\frac{\\sin t}{t^2}\\,dt$ converge absolument."
+      answer: true
+      why: "$\\left|\\frac{\\sin t}{t^2}\\right| \\le \\frac{1}{t^2}$, Riemann $\\alpha = 2$."
+    - text: "$\\int_{-1}^{1}\\frac{dx}{x^2} = -2$"
+      answer: false
+      why: "Singularité en $0$ et fonction positive : $\\int_0^1 \\frac{dx}{x^2} = +\\infty$, l'intégrale diverge."
+- id: ig-calculs
+  type: numeric
+  prompt: "Calculer $\\int_0^1 \\frac{dx}{(1 + x)\\sqrt{x}}$ (décimal à $10^{-3}$)."
+  answer: 1.5707963
+  tolerance: 0.001
+  explanation: "$u = \\sqrt{x}$ : $2\\int_0^1 \\frac{du}{1 + u^2} = 2\\arctan 1 = \\frac{\\pi}{2}$."
+  verify: {check: python_expr, expr: "calc.integral('1/((1+x)*sqrt(x))', 0, 1)"}
