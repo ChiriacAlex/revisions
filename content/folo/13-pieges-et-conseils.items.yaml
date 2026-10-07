@@ -1,0 +1,61 @@
+- id: ch13-petits-nombres
+  type: numeric
+  prompt: "Quel est le plus petit entier $n \\ge 0$ pour lequel $n^2 + n + 41$ **n'est pas** premier ?"
+  answer: 40
+  explanation: "$n^2 + n + 41$ est premier pour $n = 0, \\ldots, 39$, mais $40^2 + 40 + 41 = 1681 = 41^2$. Quarante cas vérifiés ne prouvaient rien."
+  verify: {check: python_expr, expr: "next(n for n in range(100) if any((n * n + n + 41) % d == 0 for d in range(2, n * n + n + 41)))"}
+- id: ch13-cas-limites
+  type: truefalse
+  prompt: "Pense aux cas limites. Vrai ou faux ?"
+  statements:
+    - text: Une suite périodique n'a jamais de limite.
+      answer: false
+      why: "Une suite constante est périodique et converge."
+    - text: "Toute relation symétrique et transitive sur un ensemble $E$ est réflexive."
+      answer: false
+      why: "La relation vide sur $E = \\{1\\}$ est symétrique et transitive, mais $1 \\not\\sim 1$."
+      verify: {check: relation, es: "{1}", pairs: [], property: is_reflexive}
+    - text: "Toute fonction de $\\emptyset$ dans un ensemble $F$ est injective."
+      answer: true
+      why: "Il n'y a aucun couple $x, y$ à tester : l'énoncé universel est vrai par vacuité."
+      verify: {check: python_expr, expr: "counting.folo_is_injection_on_empty()"}
+    - text: "Si $A \\cup B = A \\cup C$, alors $B = C$."
+      answer: false
+      why: "Cas limite $A = E$ : $A \\cup B = A \\cup C = E$ quels que soient $B$ et $C$."
+      verify: {check: set_statement, statement: "not ((A | B) == (A | C)) or (B == C)", witness: {A: [1], B: [1], C: []}}
+- id: ch13-contre-exemples
+  type: truefalse
+  prompt: "Les propriétés de l'exercice 1 (toutes fausses) : vérifie que tu sais les réfuter. Vrai ou faux en général ?"
+  statements:
+    - text: "$\\left(x^{2} + \\frac{1}{x^{2}}\\right) = \\left(x + \\frac{1}{x}\\right)\\left(x + \\frac{1}{x}\\right)$ pour tout $x \\neq 0$"
+      answer: false
+      why: "Pour $x = 1$ : $2 \\neq 4$. Le développement donne un terme $+2$ en trop."
+      verify: {check: python_expr, expr: "all(abs((x ** 2 + 1 / x ** 2) - (x + 1 / x) ** 2) < 1e-9 for x in (0.5, 1, 2, -3))"}
+    - text: "$(a \\le x) \\wedge (b \\le y) \\Rightarrow a - b \\le x - y$"
+      answer: false
+      why: "$a = b = x = 0$, $y = 10$ : $0 \\le -10$ est faux."
+      verify: {check: python_expr, expr: "all((not (a <= x and b <= y)) or (a - b <= x - y) for a in range(-3, 4) for b in range(-3, 4) for x in range(-3, 4) for y in range(-3, 4))"}
+    - text: "$E \\setminus A = F \\setminus A \\Rightarrow E = F$"
+      answer: false
+      why: "$E = A = \\{1\\}$, $F = \\emptyset$."
+      verify: {check: set_statement, statement: "not ((A - C) == (B - C)) or (A == B)", witness: {A: [1], B: [], C: [1]}}
+    - text: "$(a \\le x) \\wedge (b \\le y) \\Rightarrow a - y \\le x - b$"
+      answer: true
+      why: "Piège inverse : celle-ci est **vraie** : $a \\le x$ et $-y \\le -b$, on additionne."
+      verify: {check: python_expr, expr: "all((not (a <= x and b <= y)) or (a - y <= x - b) for a in range(-3, 4) for b in range(-3, 4) for x in range(-3, 4) for y in range(-3, 4))"}
+- id: ch13-ex2-ex3
+  type: truefalse
+  prompt: "Pour $A, B \\in \\mathcal{P}(E)$, vrai ou faux ?"
+  statements:
+    - text: "$A \\cap B = A \\cap B^\\complement \\iff A = \\emptyset$"
+      answer: true
+      why: "C'est l'exercice 2."
+      verify: {check: set_statement, statement: "((A & B) == (A & ~B)) == (A == empty)"}
+    - text: "$(A \\cap B^\\complement) \\cup (A^\\complement \\cap B) = B \\iff A = \\emptyset$"
+      answer: true
+      why: "C'est l'exercice 3 : la différence symétrique avec $A$ ne laisse $B$ inchangé que si $A$ est vide."
+      verify: {check: set_statement, statement: "(((A & ~B) | (~A & B)) == B) == (A == empty)"}
+    - text: "$A \\cup B = A \\cup B^\\complement \\iff A = \\emptyset$"
+      answer: false
+      why: "Par dualité, c'est équivalent à $A = E$, pas à $A = \\emptyset$ : avec $A = \\emptyset$ et $B = \\emptyset$, on a $\\emptyset \\neq E$."
+      verify: {check: set_statement, statement: "((A | B) == (A | ~B)) == (A == empty)", witness: {A: [], B: []}}

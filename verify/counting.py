@@ -47,3 +47,9 @@ def lattice_paths(right, up):
         for j in range(up + 1):
             ways[i][j] = 1 if i == 0 or j == 0 else ways[i - 1][j] + ways[i][j - 1]
     return ways[right][up]
+
+
+def folo_is_injection_on_empty():
+    """Toute fonction ∅ → F est injective (vérifié avec la solution de référence du projet)."""
+    from checks import folo
+    return all(folo.is_injection(lambda x: x, set(), F) for F in [set(), {1}, {1, 2}])

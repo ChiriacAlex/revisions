@@ -319,3 +319,45 @@ def test_ch12_subsets_containing_A_bijection():
 def test_ch12_bijections_count_n_factorial():
     for n in range(1, 7):
         assert len(list(permutations(range(n)))) == math.factorial(n)
+
+
+# ---------- Ch13 ----------
+def _is_prime(m):
+    return m >= 2 and all(m % d for d in range(2, int(m ** 0.5) + 1))
+
+
+def test_ch13_euler_polynomial():
+    assert all(_is_prime(n * n + n + 41) for n in range(40))
+    assert 40 * 40 + 40 + 41 == 1681 == 41 ** 2
+
+
+def test_ch13_sequences_counterexamples():
+    U = [1] * 10
+    V = [(-1) ** n for n in range(10)]
+    assert [u * v for u, v in zip(U, V)] == V  # le produit diverge, U converge
+    W = [(-1) ** n for n in range(10)]
+    assert all(a * b == 1 for a, b in zip(W, W))  # produit constant, facteurs divergents
+
+
+def test_ch13_exercise1_counterexamples():
+    x, n = 1, 1
+    assert (x ** (n + 1) + 1 / x ** (n + 1)) == 2 and (x ** n + 1 / x ** n) * (x + 1 / x) == 4
+    a = b = xx = 0
+    y = 10
+    assert a <= xx and b <= y and not (a - b <= xx - y)
+    E, F, A = {1}, set(), {1}
+    assert E - A == F - A and E != F
+    assert len(_powerset(E - A)) == 1 and len(_powerset(E)) - len(_powerset(A)) == 0
+    # le terme en trop du développement n'est jamais nul (|t + 1/t| ≥ 2)
+    for xv in [0.3, 0.9, 1.5, -0.4, -2.0]:
+        for nn in range(1, 6):
+            extra = xv ** (nn - 1) + 1 / xv ** (nn - 1)
+            assert abs((xv ** nn + 1 / xv ** nn) * (xv + 1 / xv) - (xv ** (nn + 1) + 1 / xv ** (nn + 1)) - extra) < 1e-9
+            assert abs(extra) >= 2 - 1e-12
+
+
+def test_ch13_injections_count_arrangements():
+    for n in range(1, 6):
+        for p in range(1, n + 1):
+            tuples = [t for t in product(range(n), repeat=p) if len(set(t)) == p]
+            assert len(tuples) == math.factorial(n) // math.factorial(n - p)
