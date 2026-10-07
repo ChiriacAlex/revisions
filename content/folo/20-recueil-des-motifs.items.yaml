@@ -1,0 +1,66 @@
+- id: motif-1
+  type: qcm
+  prompt: "But : « Montrer que $A \\cup (B \\cap C) = (A \\cup B) \\cap (A \\cup C)$. » Quel motif ouvre la preuve ?"
+  options:
+    - text: Double inclusion
+      correct: true
+      why: "Une égalité d'ensembles se prouve par double inclusion (ou par une chaîne d'équivalences sur « $x \\in \\cdot$ »)."
+    - text: Récurrence
+      why: "Aucun entier ne varie ici."
+    - text: Analyse-synthèse
+      why: "Rien d'inconnu à trouver : les deux ensembles sont donnés."
+    - text: Surjectivité
+      why: "Aucune fonction en jeu."
+- id: motif-2
+  type: qcm
+  prompt: "But : « Montrer qu'il existe un unique réel $x$ tel que $e^x = 2$. » Quel squelette ?"
+  options:
+    - text: "Existence (exhiber $x_0 = \\ln 2$), puis unicité ($e^{x_1} = e^{x_2} = 2 \\Rightarrow x_1 = x_2$)"
+      correct: true
+      why: "Motif $\\exists!$ : deux sous-buts, existence et unicité."
+    - text: "Seulement exhiber $x_0 = \\ln 2$"
+      why: "Ça prouve l'existence, pas l'unicité."
+    - text: "Par contraposée"
+      why: "L'énoncé n'est pas une implication."
+    - text: "Soit $x \\in \\mathbb{R}$…"
+      why: "C'est le motif $\\forall$ ; ici on a un $\\exists!$."
+- id: motif-3
+  type: qcm
+  prompt: "But : « Soit $n \\in \\mathbb{N}$. Si $n^2$ est impair, alors $n$ est impair. » Quel motif est le plus efficace ?"
+  options:
+    - text: Contraposée
+      correct: true
+      why: "« $n$ pair ⇒ $n^2$ pair » se prouve en une ligne avec $n = 2k$."
+    - text: Double implication
+      why: "On ne demande qu'un sens."
+    - text: Récurrence forte
+      why: "Inutile : un calcul direct suffit après contraposition."
+    - text: Disjonction de cas sur le signe de $n$
+      why: "Le signe n'a rien à voir avec la parité."
+- id: motif-4
+  type: qcm
+  prompt: "But : « Montrer que $f : \\mathcal{P}(E) \\to \\mathcal{P}(E)$, $X \\mapsto X^\\complement$, est bijective. » Le plus rapide ?"
+  options:
+    - text: "Exhiber la réciproque ($f$ elle-même) et vérifier $f \\circ f = \\mathrm{Id}$"
+      correct: true
+      why: "Motif « inversibilité » : $(X^\\complement)^\\complement = X$ donne les deux compositions d'un coup."
+    - text: "Montrer seulement l'injectivité"
+      why: "Il faut aussi la surjectivité (ou une réciproque des deux côtés)."
+    - text: "Récurrence sur $\\mathrm{Card}(E)$"
+      why: "Inutile et $E$ n'est même pas supposé fini."
+    - text: "Montrer que $\\mathrm{Card}(\\mathcal{P}(E)) = 2^n$"
+      why: "Le même cardinal ne prouve pas que **cette** fonction est bijective."
+- id: motif-5
+  type: qcm
+  prompt: "But : « Trouver tous les réels $x$ tels que $\\sqrt{x + 6} = x$. » Quel motif ?"
+  options:
+    - text: Analyse-synthèse
+      correct: true
+      why: "On ne connaît pas l'ensemble des solutions : analyse (élever au carré : $x \\in \\{3, -2\\}$), puis synthèse (seul $3$ convient)."
+      verify: {check: python_expr, expr: "[x for x in (3, -2) if abs((x + 6) ** 0.5 - x) < 1e-12] == [3]"}
+    - text: Récurrence simple
+      why: "$x$ est réel, pas un entier qu'on fait croître."
+    - text: Par l'absurde
+      why: "On peut s'en servir localement, mais le squelette global est celui de l'analyse-synthèse."
+    - text: Double inclusion
+      why: "Possible en théorie ($S = \\{3\\}$), mais il faut d'abord **trouver** $S$ : c'est l'analyse."
