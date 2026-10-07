@@ -113,3 +113,26 @@ describe("items rendering", () => {
     expect(item.multi).toBe(false);
   });
 });
+
+describe("LaTeX escaping in YAML", () => {
+  it("rejects formulas corrupted by YAML escapes such as \\n in \\neg", () => {
+    expect(() =>
+      parseItemsYaml('- {id: x1, type: numeric, prompt: "Calcul de $\\neg P$", answer: 1, explanation: ok}\n', "t.yaml"),
+    ).toThrow(/x1.*échappement/);
+  });
+
+  it("rejects control characters such as the bell produced by \\alpha", () => {
+    expect(() =>
+      parseItemsYaml('- {id: x2, type: numeric, prompt: "Angle $\\alpha$", answer: 1, explanation: ok}\n', "t.yaml"),
+    ).toThrow(/x2.*échappement/);
+  });
+
+  it("accepts properly doubled backslashes and block scalars", () => {
+    expect(() =>
+      parseItemsYaml(
+        '- id: x3\n  type: numeric\n  prompt: "Calcul de $\\\\neg P$"\n  answer: 1\n  explanation: |\n    Avec $\\neg P$ et\n    une seconde ligne.\n',
+        "t.yaml",
+      ),
+    ).not.toThrow();
+  });
+});
