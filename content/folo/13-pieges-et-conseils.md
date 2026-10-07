@@ -25,7 +25,7 @@ Soient $(U_n)$ et $(V_n)$ deux suites réelles. Si les deux suites admettent une
 :::
 
 - **Contraposée correcte** : si $(U_n V_n)$ n'a pas de limite, alors $(U_n)$ n'a pas de limite **ou** $(V_n)$ n'a pas de limite. (La négation de « A et B » est « non A **ou** non B ».)
-- **Faux** : « si $(U_n V_n)$ n'a pas de limite, alors **aucune** des deux suites n'a de limite ». Contre-exemple : $U_n = 0$ converge et… $U_n V_n = 0$ converge aussi ; prenons plutôt $U_n = 1$ et $V_n = (-1)^n$ : le produit $(-1)^n$ diverge, mais $(U_n)$ converge.
+- **Faux** : « si $(U_n V_n)$ n'a pas de limite, alors **aucune** des deux suites n'a de limite ». Contre-exemple : $U_n = 1$ et $V_n = (-1)^n$ ; le produit $(-1)^n$ n'a pas de limite, mais $(U_n)$ converge.
 - **Faux aussi** (réciproque) : « si le produit converge, les deux suites convergent ». Contre-exemple : $U_n = V_n = (-1)^n$, dont le produit vaut constamment $1$.
 
 ### 2.2 La loi des petits nombres
