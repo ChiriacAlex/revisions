@@ -232,3 +232,29 @@ def test_ch9_mean_sequence_constant():
     for n in range(100):
         u.append(sum(u) / (n + 1))
     assert all(x == 1 for x in u)
+
+
+# ---------- Ch10 ----------
+def test_ch10_encodings_of_57():
+    assert int("57") == 57 and int("111001", 2) == 57 and int("2010", 3) == 57
+
+
+def test_ch10_directed_graphs_on_3_vertices():
+    cells = [(i, j) for i in range(3) for j in range(3)]
+    graphs = {frozenset(c for c, bit in zip(cells, bits) if bit) for bits in product([0, 1], repeat=9)}
+    assert len(graphs) == 512
+    assert len({g for g in graphs if all(i != j for (i, j) in g)}) == 64
+
+
+def test_ch10_powerset_bijection_with_bitstrings():
+    E = ["a", "b", "c", "d"]
+    code = lambda X: tuple(1 if e in X else 0 for e in E)
+    subsets = _powerset(E)
+    assert folo.is_bijection(code, set(subsets), set(product([0, 1], repeat=len(E))))
+
+
+def test_ch10_zigzag_bijection_n_to_z():
+    f = lambda n: n // 2 if n % 2 == 0 else -(n + 1) // 2
+    g = lambda z: 2 * z if z >= 0 else -2 * z - 1
+    assert all(g(f(n)) == n for n in range(5000))
+    assert all(f(g(z)) == z for z in range(-2500, 2500))

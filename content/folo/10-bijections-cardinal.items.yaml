@@ -1,0 +1,25 @@
+- id: ch10-graphes
+  type: numeric
+  prompt: "Combien y a-t-il de graphes orientés sur les sommets numérotés $\\{1, 2, 3, 4\\}$, **sans** boucle (pas d'arc $i \\to i$) ?"
+  answer: 4096
+  explanation: "La matrice d'adjacence $4 \\times 4$ a $16$ cases, dont $4$ sur la diagonale (interdites) : $12$ cases libres, donc $2^{12} = 4096$ graphes."
+  verify: {check: python_expr, expr: "2 ** sum(1 for i in range(4) for j in range(4) if i != j)"}
+- id: ch10-parties
+  type: truefalse
+  prompt: "$E$ est un ensemble à $n$ éléments. Vrai ou faux ?"
+  statements:
+    - text: "$\\mathrm{Card}(\\mathcal{P}(E)) = 2^n$"
+      answer: true
+      why: "Bijection avec $\\{0, 1\\}^n$ (dedans / dehors pour chaque élément)."
+      verify: {check: python_expr, expr: "all(len(counting.powerset(range(n))) == 2 ** n for n in range(8))"}
+    - text: "$\\mathrm{Card}(\\mathcal{P}(\\mathcal{P}(E))) = 4^n$"
+      answer: false
+      why: "$\\mathcal{P}(E)$ a $2^n$ éléments, donc $\\mathcal{P}(\\mathcal{P}(E))$ en a $2^{2^n}$. Pour $n = 2$ : $2^4 = 16 = 4^2$ (coïncidence), mais pour $n = 3$ : $2^8 = 256 \\neq 64$."
+      verify: {check: python_expr, expr: "all(len(counting.powerset(counting.powerset(range(n)))) == 4 ** n for n in range(4))"}
+    - text: "$\\mathcal{P}(\\emptyset) = \\emptyset$"
+      answer: false
+      why: "$\\mathcal{P}(\\emptyset) = \\{\\emptyset\\}$ : l'ensemble vide a une partie, lui-même. Cardinal $2^0 = 1$."
+      verify: {check: python_expr, expr: "counting.powerset([]) == []"}
+    - text: "Si $E$ et $F$ sont finis de même cardinal, il existe une bijection de $E$ vers $F$."
+      answer: true
+      why: "C'est l'exercice 3 : on compose les numérotations."
