@@ -1,0 +1,81 @@
+- id: ch5-proprietes
+  type: truefalse
+  prompt: "Sur $E = \\{1, 2, 3\\}$, on considère $R = \\{(1, 1), (2, 2), (3, 3), (1, 2), (2, 1)\\}$. Vrai ou faux ?"
+  statements:
+    - text: $R$ est réflexive.
+      answer: true
+      why: "Les trois boucles $(1,1)$, $(2,2)$, $(3,3)$ sont présentes."
+      verify: {check: relation, es: "{1, 2, 3}", pairs: [[1, 1], [2, 2], [3, 3], [1, 2], [2, 1]], property: is_reflexive}
+    - text: $R$ est symétrique.
+      answer: true
+      why: "La seule flèche entre sommets distincts, $1 \\to 2$, a son retour $2 \\to 1$."
+      verify: {check: relation, es: "{1, 2, 3}", pairs: [[1, 1], [2, 2], [3, 3], [1, 2], [2, 1]], property: is_symmetric}
+    - text: $R$ est antisymétrique.
+      answer: false
+      why: "$1 \\sim 2$ et $2 \\sim 1$ avec $1 \\neq 2$."
+      verify: {check: relation, es: "{1, 2, 3}", pairs: [[1, 1], [2, 2], [3, 3], [1, 2], [2, 1]], property: is_antisymmetric}
+    - text: $R$ est transitive.
+      answer: true
+      why: "Les seuls chemins de longueur 2 passent par 1 et 2, et leurs raccourcis ($(1,1)$, $(2,2)$, $(1,2)$, $(2,1)$) sont présents."
+      verify: {check: relation, es: "{1, 2, 3}", pairs: [[1, 1], [2, 2], [3, 3], [1, 2], [2, 1]], property: is_transitive}
+    - text: $R$ est une relation d'équivalence, de classes $\{1, 2\}$ et $\{3\}$.
+      answer: true
+      why: "Réflexive, symétrique, transitive ; $[1] = [2] = \\{1, 2\\}$ et $[3] = \\{3\\}$."
+      verify: {check: relation, es: "{1, 2, 3}", pairs: [[1, 1], [2, 2], [3, 3], [1, 2], [2, 1]], property: is_equivalence}
+- id: ch5-classes
+  type: numeric
+  prompt: "Sur l'ensemble de mots $\\{$now, is, the, time, for, all, good, men, to, come, aid, of, their, county$\\}$, on considère la relation « avoir le même nombre de lettres ». Combien y a-t-il de classes d'équivalence ?"
+  answer: 5
+  explanation: "Les longueurs présentes sont 2 (is, to, of), 3 (now, the, for, all, men, aid), 4 (time, good, come), 5 (their) et 6 (county) : une classe par longueur, soit 5 classes."
+  verify: {check: python_expr, expr: "len({len(w) for w in ['now','is','the','time','for','all','good','men','to','come','aid','of','their','county']})"}
+- id: ch5-ordres
+  type: truefalse
+  prompt: Vrai ou faux ?
+  statements:
+    - text: "La divisibilité est une relation d'ordre sur $\\{1, \\ldots, 12\\}$."
+      answer: true
+      why: "Réflexive, antisymétrique (sur des entiers positifs), transitive."
+      verify: {check: relation, es: "range(1, 13)", rel: "lambda a, b: b % a == 0", property: is_partial_order}
+    - text: "La divisibilité est un ordre total sur $\\{1, \\ldots, 12\\}$."
+      answer: false
+      why: "2 et 3 ne sont pas comparables."
+      verify: {check: relation, es: "range(1, 13)", rel: "lambda a, b: b % a == 0", property: is_total_order}
+    - text: "La divisibilité est une relation d'ordre sur $\\{-2, -1, 1, 2\\}$."
+      answer: false
+      why: "$1 \\mid -1$ et $-1 \\mid 1$ avec $1 \\neq -1$ : l'antisymétrie échoue."
+      verify: {check: relation, es: "{-2, -1, 1, 2}", rel: "lambda a, b: b % a == 0", property: is_partial_order}
+    - text: "$<$ est une relation d'ordre sur $\\{0, 1, 2\\}$."
+      answer: false
+      why: "$<$ n'est pas réflexive ($0 < 0$ est faux) : c'est un ordre **strict**."
+      verify: {check: relation, es: "range(3)", rel: "lambda a, b: a < b", property: is_partial_order}
+    - text: "$<$ est antisymétrique (avec la définition à $\\Rightarrow$)."
+      answer: true
+      why: "On n'a jamais à la fois $x < y$ et $y < x$ : l'hypothèse de l'implication est toujours fausse."
+      verify: {check: relation, es: "range(5)", rel: "lambda a, b: a < b", property: is_antisymmetric}
+    - text: "L'inclusion est un ordre total sur $\\mathcal{P}(\\{1, 2\\})$."
+      answer: false
+      why: "$\\{1\\}$ et $\\{2\\}$ ne sont pas comparables."
+      verify: {check: relation, es: "{frozenset(), frozenset({1}), frozenset({2}), frozenset({1, 2})}", rel: "lambda a, b: a <= b", property: is_total_order}
+- id: ch5-ex1
+  type: qcm
+  multi: true
+  prompt: "Sur $E = \\{1, 2, 3\\}$, quelles relations sont **transitives** ?"
+  options:
+    - text: "$\\{(1, 2), (2, 1)\\}$"
+      why: "$1 \\sim 2 \\sim 1$ exige $(1, 1)$, absent. Piège classique : il faut aussi considérer les chemins qui reviennent au point de départ."
+      verify: {check: relation, es: "{1, 2, 3}", pairs: [[1, 2], [2, 1]], property: is_transitive}
+    - text: "$\\{(1, 2), (2, 3), (1, 3)\\}$"
+      correct: true
+      why: "Le seul chemin de longueur 2 est $1 \\to 2 \\to 3$, et son raccourci $(1, 3)$ est présent."
+      verify: {check: relation, es: "{1, 2, 3}", pairs: [[1, 2], [2, 3], [1, 3]], property: is_transitive}
+    - text: "$\\emptyset$"
+      correct: true
+      why: "Aucun chemin, aucun contre-exemple : vérité vide."
+      verify: {check: relation, es: "{1, 2, 3}", pairs: [], property: is_transitive}
+    - text: "$\\{(1, 2), (2, 3)\\}$"
+      why: "$1 \\to 2 \\to 3$ sans le raccourci $(1, 3)$."
+      verify: {check: relation, es: "{1, 2, 3}", pairs: [[1, 2], [2, 3]], property: is_transitive}
+    - text: "$\\{(1, 1), (2, 2)\\}$"
+      correct: true
+      why: "Les seuls chemins sont $1 \\to 1 \\to 1$ et $2 \\to 2 \\to 2$, dont les raccourcis sont présents."
+      verify: {check: relation, es: "{1, 2, 3}", pairs: [[1, 1], [2, 2]], property: is_transitive}

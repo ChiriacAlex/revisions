@@ -7,6 +7,13 @@ from itertools import product, combinations
 from math import comb, factorial
 
 import counting
+import importlib.util
+from pathlib import Path
+
+_SOLUTION = Path(__file__).resolve().parent.parent / "content" / "folo" / "python" / "folo_solution.py"
+_spec = importlib.util.spec_from_file_location("folo_reference", _SOLUTION)
+folo = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(folo)
 
 
 class B:
@@ -145,6 +152,10 @@ def witness_refutes(spec):
         if kind == "set_identity":
             return _eval_set(spec["lhs"], env) != _eval_set(spec["rhs"], env)
         return not bool(_eval_set(spec["statement"], env))
+    if kind == "quantified_implication":
+        env = {"__builtins__": {}, "all": all, "any": any, "D": list(w["D"])}
+        env.update({name: frozenset(w.get(name, [])) for name in spec["predicates"]})
+        return bool(eval(spec["hyp"], env)) and not bool(eval(spec["concl"], env))
     raise ValueError(f"témoin non géré pour {kind}")
 
 
@@ -163,6 +174,15 @@ def evaluate_check(spec):
         return quantified_implication_holds(spec["hyp"], spec["concl"], spec["predicates"], spec.get("max_domain", 3))
     if kind == "python_expr":
         return eval(spec["expr"], {"comb": comb, "factorial": factorial, "counting": counting})
+    if kind == "relation":
+        # Propriété d'une relation finie, calculée avec la solution de référence du projet (elle-même testée).
+        es = set(eval(spec["es"], {"range": range, "frozenset": frozenset}))
+        if "pairs" in spec:
+            pairs = {tuple(p) for p in spec["pairs"]}
+        else:
+            rel = eval(spec["rel"], {"abs": abs})
+            pairs = {(x, y) for x in es for y in es if rel(x, y)}
+        return getattr(folo, spec["property"])(es, pairs)
     if kind == "count":
         fn = getattr(counting, spec["fn"])
         return fn(**spec.get("args", {}))

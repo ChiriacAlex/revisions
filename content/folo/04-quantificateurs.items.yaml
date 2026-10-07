@@ -1,0 +1,64 @@
+- id: ch4-vrai-faux
+  type: truefalse
+  prompt: Vrai ou faux ?
+  statements:
+    - text: "$\\forall x \\in \\emptyset,\\ x \\neq x$"
+      answer: true
+      why: "Un énoncé universel sur l'ensemble vide est toujours vrai : il n'y a aucun $x$ pour servir de contre-exemple."
+      verify: {check: python_expr, expr: "all(x != x for x in [])"}
+    - text: "$\\exists x \\in \\emptyset,\\ x = x$"
+      answer: false
+      why: "On ne peut pas trouver d'élément dans $\\emptyset$, encore moins un qui vérifie quoi que ce soit."
+      verify: {check: python_expr, expr: "any(x == x for x in [])"}
+    - text: "$\\exists! x \\in \\mathbb{R}_+,\\ x^2 = 2$"
+      answer: true
+      why: "Existence : $\\sqrt{2}$. Unicité : si $x_1^2 = x_2^2 = 2$ avec $x_1, x_2 \\ge 0$, alors $(x_1 - x_2)(x_1 + x_2) = 0$ et $x_1 + x_2 > 0$, donc $x_1 = x_2$."
+    - text: "$\\exists! x \\in \\mathbb{R},\\ x^2 = 2$"
+      answer: false
+      why: "$\\sqrt{2}$ et $-\\sqrt{2}$ sont deux solutions distinctes : l'unicité échoue."
+    - text: "$\\exists x \\in \\mathbb{N},\\ \\forall y \\in \\mathbb{N},\\ x \\le y$"
+      answer: true
+      why: "$x = 0$ convient : c'est le minimum de $\\mathbb{N}$."
+    - text: "$\\forall y \\in \\mathbb{N},\\ \\exists x \\in \\mathbb{N},\\ x > y$"
+      answer: true
+      why: "Pour $y$ donné, $x = y + 1$ convient. Le témoin $x$ dépend de $y$, c'est permis car $\\exists x$ vient après $\\forall y$."
+    - text: "$\\exists x \\in \\mathbb{N},\\ \\forall y \\in \\mathbb{N},\\ x > y$"
+      answer: false
+      why: "Ce serait un entier plus grand que tous les entiers, y compris lui-même ($x > x$ est faux). L'ordre des quantificateurs change tout."
+- id: ch4-formaliser
+  type: qcm
+  prompt: "Quelle formule exprime « toute partie non vide de $\\mathbb{N}$ admet un minimum » ?"
+  options:
+    - text: "$\\forall A \\in \\mathcal{P}(\\mathbb{N}),\\ A \\neq \\emptyset \\Rightarrow (\\exists m \\in A,\\ \\forall a \\in A,\\ m \\le a)$"
+      correct: true
+      why: "Le minimum appartient à $A$ et minore tous les éléments de $A$ ; l'hypothèse $A \\neq \\emptyset$ est présente."
+    - text: "$\\forall A \\in \\mathcal{P}(\\mathbb{N}),\\ A \\neq \\emptyset \\Rightarrow (\\exists m \\in \\mathbb{N},\\ \\forall a \\in A,\\ m \\le a)$"
+      why: "Ici $m$ n'est qu'un **minorant** : $m = 0$ convient toujours, la formule est trivialement vraie et ne dit rien du minimum."
+    - text: "$\\forall A \\in \\mathcal{P}(\\mathbb{N}),\\ A \\neq \\emptyset \\Rightarrow (\\forall a \\in A,\\ \\exists m \\in A,\\ m \\le a)$"
+      why: "Quantificateurs inversés : pour chaque $a$, on peut prendre $m = a$. La formule est triviale."
+    - text: "$\\forall A \\in \\mathcal{P}(\\mathbb{N}),\\ \\exists m \\in A,\\ \\forall a \\in A,\\ m \\le a$"
+      why: "L'hypothèse $A \\neq \\emptyset$ manque : pour $A = \\emptyset$, $\\exists m \\in \\emptyset$ est faux, donc la formule est fausse."
+- id: ch4-distributivite
+  type: truefalse
+  prompt: "$P$ et $Q$ sont des prédicats sur un ensemble $E$. Les implications suivantes sont-elles toujours vraies ?"
+  statements:
+    - text: "$\\big(\\forall x,\\ P(x) \\vee Q(x)\\big) \\Rightarrow \\big((\\forall x,\\ P(x)) \\vee (\\forall x,\\ Q(x))\\big)$"
+      answer: false
+      why: "Avec $E = \\mathbb{N}$, $P$ = « pair », $Q$ = « impair » : tout entier est pair ou impair, mais ils ne sont pas tous pairs, ni tous impairs."
+      verify: {check: quantified_implication, hyp: "all(x in P or x in Q for x in D)", concl: "all(x in P for x in D) or all(x in Q for x in D)", predicates: [P, Q], witness: {D: [0, 1], P: [0], Q: [1]}}
+    - text: "$\\big((\\forall x,\\ P(x)) \\vee (\\forall x,\\ Q(x))\\big) \\Rightarrow \\big(\\forall x,\\ P(x) \\vee Q(x)\\big)$"
+      answer: true
+      why: "Si par exemple tous les $x$ vérifient $P$, alors chaque $x$ vérifie $P \\vee Q$ (même raisonnement si c'est $Q$)."
+      verify: {check: quantified_implication, hyp: "all(x in P for x in D) or all(x in Q for x in D)", concl: "all(x in P or x in Q for x in D)", predicates: [P, Q]}
+    - text: "$\\big((\\exists x,\\ P(x)) \\wedge (\\exists x,\\ Q(x))\\big) \\Rightarrow \\big(\\exists x,\\ P(x) \\wedge Q(x)\\big)$"
+      answer: false
+      why: "Il existe un entier pair et il existe un entier impair, mais aucun entier n'est les deux à la fois : les deux témoins sont différents."
+      verify: {check: quantified_implication, hyp: "any(x in P for x in D) and any(x in Q for x in D)", concl: "any(x in P and x in Q for x in D)", predicates: [P, Q], witness: {D: [0, 1], P: [0], Q: [1]}}
+    - text: "$\\big(\\exists x,\\ P(x) \\wedge Q(x)\\big) \\Rightarrow \\big((\\exists x,\\ P(x)) \\wedge (\\exists x,\\ Q(x))\\big)$"
+      answer: true
+      why: "Le même témoin $x_0$ sert pour $P$ et pour $Q$."
+      verify: {check: quantified_implication, hyp: "any(x in P and x in Q for x in D)", concl: "any(x in P for x in D) and any(x in Q for x in D)", predicates: [P, Q]}
+    - text: "$\\big(\\forall x,\\ P(x) \\wedge Q(x)\\big) \\Rightarrow \\big((\\forall x,\\ P(x)) \\wedge (\\forall x,\\ Q(x))\\big)$"
+      answer: true
+      why: "$\\forall$ se distribue sur $\\wedge$ (et la réciproque est vraie aussi)."
+      verify: {check: quantified_implication, hyp: "all(x in P and x in Q for x in D)", concl: "all(x in P for x in D) and all(x in Q for x in D)", predicates: [P, Q]}
