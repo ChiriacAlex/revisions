@@ -1,0 +1,41 @@
+- id: ch9-fibonacci
+  type: numeric
+  prompt: "Avec $F_0 = F_1 = 1$ et $F_{n+2} = F_{n+1} + F_n$, que vaut $F_{10}$ ?"
+  answer: 89
+  explanation: "$1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89$ : $F_{10} = 89$. Et la borne est bien respectée : $(5/3)^{10} \\approx 165{,}4$."
+  verify: {check: python_expr, expr: "(lambda f: f(f, 10))(lambda self, n: 1 if n < 2 else self(self, n - 1) + self(self, n - 2))"}
+- id: ch9-pieces
+  type: numeric
+  prompt: "Quel est le plus grand entier naturel qui **ne** s'écrit **pas** sous la forme $3a + 5b$ avec $a, b \\in \\mathbb{N}$ ?"
+  answer: 7
+  explanation: "$1, 2, 4, 7$ ne s'écrivent pas ainsi ; $8 = 3 + 5$, $9 = 3 \\cdot 3$, $10 = 5 \\cdot 2$, et ensuite on ajoute des pièces de 3. D'où le rang de départ $n_0 = 8$ de l'exercice 2."
+  verify: {check: python_expr, expr: "max(n for n in range(200) if not any(3 * a + 5 * b == n for a in range(70) for b in range(45)))"}
+- id: ch9-choix
+  type: qcm
+  prompt: "Pour prouver que tout entier $n \\ge 1$ s'écrit comme une somme de puissances de 2 **distinctes** (écriture binaire), en utilisant la plus grande puissance $2^l \\le n$, quelle récurrence est la plus adaptée ?"
+  options:
+    - text: Récurrence simple
+      why: "L'écriture de $n$ ne dit rien de celle de $n + 1$ : on a besoin de $n - 2^l$, dont le rang dépend de $n$."
+    - text: Récurrence d'ordre 2
+      why: "Le rang utilisé, $n - 2^l$, n'est pas à une distance fixe de $n$."
+    - text: Récurrence forte
+      correct: true
+      why: "On applique l'hypothèse à $n - 2^l < n$, rang inconnu à l'avance : c'est exactement le cas de la récurrence forte (TD 2, exercice 3)."
+- id: ch9-ordres
+  type: truefalse
+  prompt: Vrai ou faux ?
+  statements:
+    - text: "$\\le$ est un ordre bien fondé sur $\\mathbb{Z}$."
+      answer: false
+      why: "$\\mathbb{Z}$ lui-même (partie non vide) n'a pas d'élément minimal."
+    - text: "La divisibilité est un ordre bien fondé sur $\\mathbb{N}^*$."
+      answer: true
+      why: "Dans une partie non vide, un élément de valeur minimale (pour $\\le$) est minimal pour $\\mid$, car un diviseur strict est strictement plus petit."
+    - text: "Dans $\\{\\{1\\}, \\{2\\}, \\{1, 2\\}\\}$ ordonné par $\\subseteq$, il y a deux éléments minimaux."
+      answer: true
+      why: "$\\{1\\}$ et $\\{2\\}$ : aucun autre élément de l'ensemble n'est inclus dans l'un d'eux."
+      verify: {check: python_expr, expr: "len([x for x in [frozenset({1}), frozenset({2}), frozenset({1, 2})] if not any(y != x and y <= x for y in [frozenset({1}), frozenset({2}), frozenset({1, 2})])]) == 2"}
+    - text: "Les éléments minimaux de $\\{n \\ge 2\\}$ pour la divisibilité sont les nombres premiers."
+      answer: true
+      why: "$n$ est minimal ssi aucun $d \\ge 2$, $d \\ne n$, ne divise $n$ : c'est la définition d'un nombre premier."
+      verify: {check: python_expr, expr: "[n for n in range(2, 60) if not any(d != n and n % d == 0 for d in range(2, n + 1))] == [p for p in range(2, 60) if all(p % d for d in range(2, p))]"}

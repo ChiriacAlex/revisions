@@ -196,3 +196,39 @@ def test_ch8_nine_divides_ten_power_plus_one_never():
 def test_ch8_divisibility_and_powers():
     assert all((n ** 3 - n) % 3 == 0 for n in range(1000))
     assert all(2 ** n >= n * n for n in range(4, 500)) and 2 ** 3 < 9
+
+
+# ---------- Ch9 ----------
+from fractions import Fraction
+
+
+def _fib(n):
+    a, b = 1, 1
+    for _ in range(n):
+        a, b = b, a + b
+    return a
+
+
+def test_ch9_fibonacci_bound_exact():
+    for n in range(300):
+        assert Fraction(_fib(n)) <= Fraction(5, 3) ** n
+    assert Fraction(5, 3) + 1 == Fraction(24, 9) and Fraction(5, 3) ** 2 == Fraction(25, 9)
+
+
+def test_ch9_three_five_both_methods():
+    for n in range(8, 400):
+        assert any(3 * a + 5 * b == n for a in range(n // 3 + 1) for b in range(n // 5 + 1))
+    assert not any(3 * a + 5 * b == 7 for a in range(3) for b in range(2))
+    # méthode 2 : les deux remplacements de pièces conservent la somme + 1
+    for a in range(3, 30):
+        assert 3 * a + 1 == 3 * (a - 3) + 5 * 2
+    for a in range(0, 30):
+        for b in range(1, 30):
+            assert 3 * a + 5 * b + 1 == 3 * (a + 2) + 5 * (b - 1)
+
+
+def test_ch9_mean_sequence_constant():
+    u = [Fraction(1)]
+    for n in range(100):
+        u.append(sum(u) / (n + 1))
+    assert all(x == 1 for x in u)
