@@ -206,3 +206,70 @@ def test_heights_example():
 def test_gamma_function_factorial():
     for n in range(1, 10):
         assert abs(math.gamma(n) - math.factorial(n - 1)) < 1e-6
+
+
+# ---------- TD lois continues ----------
+def _bisect(g, lo, hi, it=200):
+    for _ in range(it):
+        mid = (lo + hi) / 2
+        if (g(lo) > 0) == (g(mid) > 0):
+            lo = mid
+        else:
+            hi = mid
+    return (lo + hi) / 2
+
+
+def test_tdc_ex1_parameters_and_intervals():
+    assert abs(I(lambda x: 2 / x ** 2, 2, 20000, 2_000_000) - 1) < 1e-3
+    assert abs(2 / 0.975 - 2.051) < 1e-3 and 2 / 0.025 == 80
+    assert abs(2 * I(lambda x: math.exp(-2 * x), 0, 60) - 1) < 1e-9
+    b = math.log(20) / 2
+    assert abs(b - 1.498) < 1e-3 and abs(1 - math.exp(-2 * b) / 2 - 0.975) < 1e-12
+    assert abs(I(lambda x: 0.75 * x * (2 - x), 0, 2) - 1) < 1e-12
+    F3 = lambda x: 0.75 * x * x - x ** 3 / 4
+    a = _bisect(lambda x: F3(x) - 0.025, 0, 1)
+    assert abs(F3(a) - 0.025) < 1e-12
+    assert round(a, 3) == 0.189 and round(2 - a, 3) == 1.811 and abs(F3(2 - a) - 0.975) < 1e-9
+
+
+def test_tdc_ex2_probabilities_and_cdf():
+    f = lambda x: 0.75 * (1 - x * x)
+    assert abs(I(f, -1, 0) - 0.5) < 1e-12
+    assert abs(I(f, -0.5, 0.5) - 11 / 16) < 1e-12
+    assert abs(I(f, 0.5, 1) - 5 / 32) < 1e-12
+    F = lambda x: 0.5 + 0.75 * x - x ** 3 / 4
+    for x in [-1, -0.3, 0, 0.4, 1]:
+        assert abs(F(x) - I(f, -1, x)) < 1e-12
+
+
+def test_tdc_ex3_uniform():
+    assert (6 - 3) / 6 == 0.5
+    lo, hi = -3 + 8 * 0.0, -3 + 8 * 0.999999
+    assert lo == -3 and hi < 5
+
+
+def test_tdc_ex4_exponential():
+    lam = 1 / 4
+    assert abs(math.exp(-2) - 0.135) < 1e-3
+    a = 4 * math.log(10)
+    assert abs(a - 9.21) < 1e-2 and abs(1 - math.exp(-lam * a) - 0.9) < 1e-12
+    assert abs(math.exp(-0.5) - 0.607) < 1e-3
+
+
+def test_tdc_ex5_normal():
+    assert abs(1 - Phi(2) - 0.0228) < 1e-4
+    assert abs(120 - 1.96 * 15 - 90.6) < 1e-9 and abs(120 + 1.96 * 15 - 149.4) < 1e-9
+
+
+def test_tdc_extras():
+    # |X| avec X ~ U([-2, 1])
+    for t in [0.2, 0.7, 1.0, 1.3, 1.9]:
+        direct = I(lambda x: 1 / 3, max(-t, -2), min(t, 1))
+        formula = 2 * t / 3 if t <= 1 else (1 + t) / 3
+        assert abs(direct - formula) < 1e-12
+    # X ~ E(1) : X² et e^X
+    for t in [0.5, 2, 7]:
+        assert abs(1 - math.exp(-math.sqrt(t)) - I(lambda x: math.exp(-x), 0, math.sqrt(t))) < 1e-9
+    for t in [1.5, 3, 10]:
+        assert abs(1 - 1 / t - I(lambda x: math.exp(-x), 0, math.log(t))) < 1e-9
+        assert abs(I(lambda w: 1 / w ** 2, 1, t) - (1 - 1 / t)) < 1e-9
