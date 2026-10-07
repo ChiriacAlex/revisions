@@ -929,12 +929,12 @@ button {
 .feedback.ok {
   background: var(--ok-soft);
   color: var(--text);
-  border-left: 3px solid var(--ok);
+  border: 1px solid color-mix(in srgb, var(--ok) 45%, transparent);
 }
 .feedback.ko {
   background: var(--ko-soft);
   color: var(--text);
-  border-left: 3px solid var(--ko);
+  border: 1px solid color-mix(in srgb, var(--ko) 45%, transparent);
 }
 .feedback .explain {
   margin-top: 6px;
