@@ -1,0 +1,14 @@
+- id: tdp-dirichlet
+  type: numeric
+  prompt: "Avec $F(x) = \\int_0^{+\\infty}\\frac{\\sin t}{t}e^{-xt}\\,dt$, calculer $F(1)$ (décimal à $10^{-3}$)."
+  answer: 0.7853982
+  tolerance: 0.001
+  explanation: "$F(x) = \\frac{\\pi}{2} - \\arctan x$, donc $F(1) = \\frac{\\pi}{2} - \\frac{\\pi}{4} = \\frac{\\pi}{4}$."
+  verify: {check: python_expr, expr: "calc.integral('sin(x)/x*exp(-x)', 0, 'oo')"}
+- id: tdp-frullani
+  type: numeric
+  prompt: "Calculer $\\int_0^{+\\infty}\\frac{e^{-t} - e^{-3t}}{t}\\,dt$ (décimal à $10^{-3}$)."
+  answer: 1.0986123
+  tolerance: 0.001
+  explanation: "Frullani : $\\int_0^{+\\infty}\\frac{e^{-at} - e^{-bt}}{t}\\,dt = \\ln\\frac{b}{a} = \\ln 3$."
+  verify: {check: python_expr, expr: "calc.integral('(exp(-x)-exp(-3*x))/x', 0, 'oo')"}

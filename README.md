@@ -35,7 +35,10 @@ La progression (quiz réussis, chapitres terminés, code du labo) reste stockée
    et les blocs repliés `:::hint[Indice 1]`, `:::correction`, `:::solution`, `:::skeleton`.
 4. Quiz auto-corrigés dans `NN-nom.items.yaml` (types `qcm`, `truefalse`, `numeric`), insérés avec `::item{id="…"}`.
    Chaque réponse calculable reçoit un champ `verify` (table de vérité, identité ensembliste, dénombrement,
-   expression Python…) recalculé par `npm run verify:py`.
+   expression Python…) recalculé par `npm run verify:py`. Pour l'analyse, l'expression peut utiliser `calc`
+   (`verify/calculus.py`, SymPy + mpmath) : `calc.antiderivative_ok(f, F)` dérive la primitive proposée,
+   `calc.integral(f, a, b)` calcule une intégrale (généralisée), `calc.series_coeff`, `calc.limit`, `calc.identity`.
+   Les calculs écrits dans la prose sont vérifiés dans `verify/test_*_facts.py`.
 
 Le build échoue si : une directive est inconnue, un quiz n'a pas de bonne réponse ou d'explication, un quiz
 n'est jamais affiché, une formule LaTeX est invalide, ou un échappement YAML a corrompu une formule.
@@ -47,4 +50,4 @@ npm run check      # contenu + typecheck + lint + tests unitaires + vérificatio
 npm run test:e2e   # site statique servi sous /revisions comme sur GitHub Pages (Chrome installé)
 ```
 
-Les tests Python nécessitent un venv : `python3 -m venv .venv && .venv/bin/pip install pytest pyyaml`.
+Les tests Python nécessitent un venv : `python3 -m venv .venv && .venv/bin/pip install pytest pyyaml sympy mpmath`.

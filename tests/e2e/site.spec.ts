@@ -1,10 +1,25 @@
 import { expect, test } from "@playwright/test";
 
-test("la page d'accueil est publique et liste les deux cours", async ({ page }) => {
+test("la page d'accueil est publique et liste les trois cours", async ({ page }) => {
   await page.goto("./");
   await expect(page.getByRole("heading", { name: "Mes cours" })).toBeVisible();
   await expect(page.getByText("Logical Formalism (FOLO)")).toBeVisible();
   await expect(page.getByText("Probabilités et statistiques (PBS)")).toBeVisible();
+  await expect(page.getByText("Intégration et approximation de fonctions (IGAF)")).toBeVisible();
+});
+
+test("l'erratum IGAF renvoie vers des chapitres qui existent", async ({ page, request }) => {
+  await page.goto("courses/igaf/erratum/");
+  const hrefs = await page.locator("article a[href^='../']").evaluateAll((links) =>
+    links.map((a) => (a as HTMLAnchorElement).href),
+  );
+  expect(hrefs.length).toBeGreaterThan(5);
+  for (const href of new Set(hrefs)) {
+    expect((await request.get(href)).status(), href).toBe(200);
+  }
+  await page.getByRole("link", { name: "Primitives", exact: true }).first().click();
+  await expect(page.getByRole("heading", { name: /Ch1 — Primitives/ })).toBeVisible();
+  await expect(page.locator(".katex").first()).toBeVisible();
 });
 
 test("on navigue de l'accueil vers un chapitre (liens compatibles avec le sous-dossier)", async ({ page }) => {

@@ -1,0 +1,28 @@
+- id: param-theoremes
+  type: truefalse
+  prompt: Vrai ou faux ?
+  statements:
+    - text: "Pour montrer que $F(x) = \\int_J f(x, t)\\,dt$ est continue sur $]0, +\\infty[$, il suffit de dominer $|f(x, t)|$ sur chaque segment $[a, b] \\subset ]0, +\\infty[$."
+      answer: true
+      why: "La continuité est locale : domination locale suffit (c'est ce qu'on fait pour $\\Gamma$)."
+    - text: "Pour dériver sous l'intégrale (Leibniz), il faut dominer $|f(x, t)|$."
+      answer: false
+      why: "Il faut dominer la **dérivée partielle** $\\left|\\frac{\\partial f}{\\partial x}(x, t)\\right|$ (et que $f(x, \\cdot)$ soit intégrable)."
+    - text: "$\\Gamma(5) = 24$"
+      answer: true
+      why: "$\\Gamma(n) = (n - 1)!$, donc $\\Gamma(5) = 4! = 24$."
+      verify: {check: python_expr, expr: "abs(calc.integral('exp(-x)*x**4', 0, 'oo') - 24) < 1e-9"}
+    - text: "$\\Gamma$ est définie sur $]-1, +\\infty[$."
+      answer: false
+      why: "En $0$, $e^{-t}t^{x-1} \\sim t^{x-1}$ : il faut $x > 0$."
+    - text: "$\\int_0^{+\\infty}t^2e^{-xt}\\,dt = \\frac{2}{x^3}$ pour $x > 0$."
+      answer: true
+      why: "On dérive deux fois $\\int_0^{+\\infty}e^{-xt}\\,dt = \\frac{1}{x}$ sous l'intégrale."
+      verify: {check: python_expr, expr: "abs(calc.integral('x**2*exp(-3*x)', 0, 'oo') - 2 / 27) < 1e-12"}
+- id: param-valeurs
+  type: numeric
+  prompt: "Calculer $\\int_{-\\infty}^{+\\infty}e^{-4x^2}\\,dx$ (décimal à $10^{-3}$)."
+  answer: 0.8862269
+  tolerance: 0.001
+  explanation: "$\\int_{\\mathbb{R}}e^{-\\alpha x^2}\\,dx = \\sqrt{\\frac{\\pi}{\\alpha}}$ avec $\\alpha = 4$ : $\\frac{\\sqrt{\\pi}}{2} \\approx 0{,}886$."
+  verify: {check: python_expr, expr: "calc.integral('exp(-4*x**2)', '-oo', 'oo')"}

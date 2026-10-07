@@ -189,9 +189,18 @@ Ce sont les deux listes d'exercices du poly (changement de variable puis intégr
 
 ### Changement de variable
 
-1. $\int (x^3 + x)^5(3x^2 + 1)\,dx$ $\quad$ 2. $\int (3x + 2)(3x^2 + 4x)^4\,dx$ $\quad$ 3. $\int \sqrt{2x + 1}\,dx$ $\quad$ 4. $\int x\sqrt{2x + 1}\,dx$
-5. $\int \frac{2x\,dx}{\sqrt[3]{x^2 + 1}}$ $\quad$ 6. $\int 2(2x + 4)^5\,dx$ $\quad$ 7. $\int 7\sqrt{7x - 1}\,dx$ $\quad$ 8. $\int 2x(x^2 + 5)^{-4}\,dx$
-9. $\int \frac{4x^3}{(x^4 + 1)^2}\,dx$ $\quad$ 10. $\int x^2 \sin(x^3)\,dx$ $\quad$ 11. $\int \frac{(1 + \sqrt{x})^{1/3}}{\sqrt{x}}\,dx$ $\quad$ 12. $\int x \sin(2x^2)\,dx$
+1. $\int (x^3 + x)^5(3x^2 + 1)\,dx$
+2. $\int (3x + 2)(3x^2 + 4x)^4\,dx$
+3. $\int \sqrt{2x + 1}\,dx$
+4. $\int x\sqrt{2x + 1}\,dx$
+5. $\int \frac{2x\,dx}{\sqrt[3]{x^2 + 1}}$
+6. $\int 2(2x + 4)^5\,dx$
+7. $\int 7\sqrt{7x - 1}\,dx$
+8. $\int 2x(x^2 + 5)^{-4}\,dx$
+9. $\int \frac{4x^3}{(x^4 + 1)^2}\,dx$
+10. $\int x^2 \sin(x^3)\,dx$
+11. $\int \frac{(1 + \sqrt{x})^{1/3}}{\sqrt{x}}\,dx$
+12. $\int x \sin(2x^2)\,dx$
 
 :::solution[Solutions 1 à 12]
 1. $u = x^3 + x$ : $\frac{(x^3 + x)^6}{6}$.
@@ -208,9 +217,16 @@ Ce sont les deux listes d'exercices du poly (changement de variable puis intégr
 12. $u = 2x^2$ : $-\frac{1}{4}\cos(2x^2)$.
 :::
 
-13. $\int \left(1 - \cos\frac{x}{2}\right)^2 \sin\frac{x}{2}\,dx$ $\quad$ 14. $\int \frac{9x^2}{\sqrt{1 - x^3}}\,dx$ $\quad$ 15. $\int \frac{1}{x^2}\cos^2\frac{1}{x}\,dx$ $\quad$ 16. $\int \sqrt{x}\,\sin^2(x^{3/2} - 1)\,dx$
-17. $\int \frac{dx}{\sqrt{5x + 8}}$ $\quad$ 18. $\int x\sqrt[4]{1 - x^2}\,dx$ $\quad$ 19. $\int \frac{dx}{\sqrt{x}(1 + \sqrt{x})^2}$ $\quad$ 20. $\int \sin^5\frac{x}{3}\cos\frac{x}{3}\,dx$
-21. $\int \frac{\sin(2x + 1)}{\cos^2(2x + 1)}\,dx$ $\quad$ 22. $\int \frac{1}{x^2}\cos\left(\frac{1}{x} - 1\right)dx$
+13. $\int \left(1 - \cos\frac{x}{2}\right)^2 \sin\frac{x}{2}\,dx$
+14. $\int \frac{9x^2}{\sqrt{1 - x^3}}\,dx$
+15. $\int \frac{1}{x^2}\cos^2\frac{1}{x}\,dx$
+16. $\int \sqrt{x}\,\sin^2(x^{3/2} - 1)\,dx$
+17. $\int \frac{dx}{\sqrt{5x + 8}}$
+18. $\int x\sqrt[4]{1 - x^2}\,dx$
+19. $\int \frac{dx}{\sqrt{x}(1 + \sqrt{x})^2}$
+20. $\int \sin^5\frac{x}{3}\cos\frac{x}{3}\,dx$
+21. $\int \frac{\sin(2x + 1)}{\cos^2(2x + 1)}\,dx$
+22. $\int \frac{1}{x^2}\cos\left(\frac{1}{x} - 1\right)dx$
 
 :::solution[Solutions 13 à 22]
 13. $u = 1 - \cos\frac{x}{2}$, $du = \frac{1}{2}\sin\frac{x}{2}\,dx$ : $\frac{2}{3}\left(1 - \cos\frac{x}{2}\right)^3$.
@@ -225,9 +241,17 @@ Ce sont les deux listes d'exercices du poly (changement de variable puis intégr
 22. $u = \frac{1}{x} - 1$, $du = -\frac{dx}{x^2}$ : $-\sin\left(\frac{1}{x} - 1\right)$.
 :::
 
-23. $\int \frac{\cos(\sqrt{x} + 3)}{\sqrt{x}}\,dx$ $\quad$ 24. $\int \frac{1}{x^2}\sqrt{2 - \frac{1}{x}}\,dx$ $\quad$ 25. $\int \frac{1}{x^2}\sin\frac{1}{x}\cos\frac{1}{x}\,dx$ $\quad$ 26. $\int \frac{1}{x^3}\sqrt{\frac{x^2 - 1}{x^2}}\,dx$
-27. $\int x\sqrt{4 - x}\,dx$ $\quad$ 28. $\int (x + 1)^2(1 - x)^5\,dx$ $\quad$ 29. $\int (x + 5)(x - 5)^{1/3}\,dx$ $\quad$ 30. $\int x^3\sqrt{x^2 + 1}\,dx$
-31. $\int 3x^5\sqrt{x^3 + 1}\,dx$ $\quad$ 32. $\int \frac{x}{(x^2 - 4)^3}\,dx$ $\quad$ 33. $\int \frac{x}{(x - 4)^3}\,dx$
+23. $\int \frac{\cos(\sqrt{x} + 3)}{\sqrt{x}}\,dx$
+24. $\int \frac{1}{x^2}\sqrt{2 - \frac{1}{x}}\,dx$
+25. $\int \frac{1}{x^2}\sin\frac{1}{x}\cos\frac{1}{x}\,dx$
+26. $\int \frac{1}{x^3}\sqrt{\frac{x^2 - 1}{x^2}}\,dx$
+27. $\int x\sqrt{4 - x}\,dx$
+28. $\int (x + 1)^2(1 - x)^5\,dx$
+29. $\int (x + 5)(x - 5)^{1/3}\,dx$
+30. $\int x^3\sqrt{x^2 + 1}\,dx$
+31. $\int 3x^5\sqrt{x^3 + 1}\,dx$
+32. $\int \frac{x}{(x^2 - 4)^3}\,dx$
+33. $\int \frac{x}{(x - 4)^3}\,dx$
 
 :::solution[Solutions 23 à 33]
 23. $u = \sqrt{x} + 3$ : $2\sin(\sqrt{x} + 3)$.
@@ -245,8 +269,17 @@ Ce sont les deux listes d'exercices du poly (changement de variable puis intégr
 
 ### Intégration par parties
 
-34. $\int x\ln x\,dx$ $\quad$ 35. $\int x\sin x\,dx$ $\quad$ 36. $\int x^2\sin x\,dx$ $\quad$ 37. $\int x\cos x\,dx$ $\quad$ 38. $\int x^2\cos x\,dx$ $\quad$ 39. $\int x e^x\,dx$
-40. $\int x\arctan x\,dx$ $\quad$ 41. $\int x^3\sin x\,dx$ $\quad$ 42. $\int x^3\cos x\,dx$ $\quad$ 43. $\int x\sin x\cos x\,dx$ $\quad$ 44. $\int x\sin^2 x\,dx$
+34. $\int x\ln x\,dx$
+35. $\int x\sin x\,dx$
+36. $\int x^2\sin x\,dx$
+37. $\int x\cos x\,dx$
+38. $\int x^2\cos x\,dx$
+39. $\int x e^x\,dx$
+40. $\int x\arctan x\,dx$
+41. $\int x^3\sin x\,dx$
+42. $\int x^3\cos x\,dx$
+43. $\int x\sin x\cos x\,dx$
+44. $\int x\sin^2 x\,dx$
 
 :::solution[Solutions 34 à 44]
 34. $u = \ln x$ : $\frac{x^2}{2}\ln x - \frac{x^2}{4}$.

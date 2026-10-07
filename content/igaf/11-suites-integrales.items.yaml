@@ -1,0 +1,45 @@
+- id: suites-simple
+  type: qcm
+  multi: true
+  prompt: "Quelles suites de fonctions convergent simplement vers la fonction **nulle** ?"
+  options:
+    - text: "$x^n$ sur $[0, 1]$"
+      why: "En $x = 1$, $1^n = 1$."
+    - text: "$x^n$ sur $\\left[0, \\frac{1}{2}\\right]$"
+      correct: true
+      why: "$0 \\le x^n \\le 2^{-n} \\to 0$."
+    - text: "$\\frac{x}{n}$ sur $\\mathbb{R}$"
+      correct: true
+      why: "$x$ fixé, $\\frac{x}{n} \\to 0$."
+    - text: "$\\frac{x^2}{n + x^2}$ sur $\\mathbb{R}$"
+      correct: true
+      why: "$x$ fixé, le dénominateur tend vers $+\\infty$ (et en $x = 0$ la fonction vaut $0$)."
+    - text: "$e^{-(x - n)^2}$ sur $[0, +\\infty[$"
+      correct: true
+      why: "$x$ fixé, $(x - n)^2 \\to +\\infty$. (Mais l'intégrale tend vers $\\sqrt{\\pi}$, pas vers $0$ !)"
+- id: suites-cpm
+  type: truefalse
+  prompt: Continuité par morceaux. Vrai ou faux ?
+  statements:
+    - text: "$\\lfloor x\\rfloor$ est continue par morceaux sur $[0, 10]$."
+      answer: true
+      why: "Un nombre fini de sauts (en $1, 2, \\ldots, 10$), tous finis."
+    - text: "$\\sin\\frac{1}{x}$ (prolongée par $0$ en $0$) est continue par morceaux sur $[0, 1]$."
+      answer: false
+      why: "Pas de limite en $0^+$."
+    - text: "$\\sin\\frac{1}{x}$ est continue par morceaux sur $]0, 1]$."
+      answer: true
+      why: "Elle est continue sur tout segment $[a, b] \\subset ]0, 1]$ (car $a > 0$)."
+    - text: "$\\left\\lfloor\\frac{1}{x}\\right\\rfloor$ est continue par morceaux sur $]0, 1]$."
+      answer: true
+      why: "Infinité de sauts, mais en nombre fini sur chaque segment $[a, b]$ avec $a > 0$."
+    - text: "La fonction de Dirichlet ($1$ sur $\\mathbb{Q}$, $0$ ailleurs) est continue par morceaux sur $[0, 1]$."
+      answer: false
+      why: "Elle est discontinue en **tout** point et n'a de limite nulle part."
+- id: suites-tcd
+  type: numeric
+  prompt: "Calculer $\\lim_{n \\to +\\infty}\\int_0^{+\\infty}\\frac{dt}{t^n + e^t}$ (décimal à $10^{-3}$)."
+  answer: 0.6321206
+  tolerance: 0.001
+  explanation: "TCD avec la domination $\\frac{1}{t^n + e^t} \\le e^{-t}$ : la limite est $\\int_0^1 e^{-t}\\,dt = 1 - e^{-1}$."
+  verify: {check: python_expr, expr: "calc.integral('exp(-x)', 0, 1)"}

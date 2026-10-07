@@ -1,0 +1,22 @@
+- id: tds-echange
+  type: truefalse
+  prompt: "Peut-on écrire $\\lim\\int = \\int\\lim$ ? Vrai ou faux ?"
+  statements:
+    - text: "Pour $f_n(x) = x^n$ sur $[0, 1]$ : $\\lim_n\\int_0^1 f_n = \\int_0^1\\lim_n f_n$."
+      answer: true
+      why: "Les deux valent $0$ ($\\frac{1}{n + 1} \\to 0$) ; domination par $1$ sur un segment."
+      verify: {check: python_expr, expr: "calc.integral('x**200', 0, 1) < 0.005"}
+    - text: "Pour $f_n = n\\,\\mathbb{1}_{]0, 1/n]}$ sur $[0, 1]$ : $\\lim_n\\int_0^1 f_n = 0$."
+      answer: false
+      why: "$\\int_0^1 f_n = 1$ pour tout $n$, alors que la limite simple est nulle."
+    - text: "Pour $f_n(x) = (n + 1)x^n$ sur $[0, 1[$ : $\\int_0^1 f_n = 1$ pour tout $n$."
+      answer: true
+      why: "$\\big[x^{n+1}\\big]_0^1 = 1$."
+      verify: {check: python_expr, expr: "abs(calc.integral('51*x**50', 0, 1) - 1) < 1e-12"}
+- id: tds-tcd
+  type: numeric
+  prompt: "Calculer $\\lim_{n \\to +\\infty}\\int_0^{+\\infty}\\frac{n\\ln\\left(1 + \\frac{x}{n}\\right)}{(1 + x^2)^2}\\,dx$ (décimal)."
+  answer: 0.5
+  tolerance: 0.001
+  explanation: "Limite simple $\\frac{x}{(1 + x^2)^2}$, domination par cette même fonction (car $\\ln(1 + u) \\le u$), donc la limite vaut $\\int_0^{+\\infty}\\frac{x\\,dx}{(1 + x^2)^2} = \\frac{1}{2}$."
+  verify: {check: python_expr, expr: "calc.integral('x/(1+x**2)**2', 0, 'oo')"}

@@ -379,3 +379,74 @@ def test_fresnel_value():
     mpmath.mp.dps = 20
     value = mpmath.quadosc(lambda t: mpmath.cos(t * t), [0, mpmath.inf], zeros=lambda n: mpmath.sqrt(mpmath.pi * (n - 0.5)))
     assert float(value) == pytest.approx(0.5 * math.sqrt(math.pi / 2), rel=1e-8)
+
+
+# ---------- Ch4 — Suites d'intégrales ----------
+def test_dominated_convergence_examples():
+    seq = [integral(f"1/(x**{n}+exp(x))", 0, "oo", breakpoints=(1,)) for n in (5, 20, 80)]
+    assert abs(seq[-1] - (1 - math.exp(-1))) < abs(seq[0] - (1 - math.exp(-1)))
+    assert seq[-1] == pytest.approx(1 - math.exp(-1), abs=1e-2)
+    assert integral("sin(x)**200", 0, "pi/2") == pytest.approx(math.sqrt(math.pi / 400), rel=1e-2)
+    for n in (1, 5, 20):  # la bosse qui s'échappe garde une aire proche de √π
+        assert integral(f"exp(-(x-{n})**2)", 0, "oo", breakpoints=(n,)) == pytest.approx(
+            math.sqrt(math.pi) * (1 + math.erf(n)) / 2)
+    for n in (1, 4, 10):  # densité normale N(0, 1/n²) : aire 1
+        assert integral(f"{n}/sqrt(2*pi)*exp(-{n}**2*x**2/2)", "-oo", "oo", breakpoints=(0,)) == pytest.approx(1)
+    for n in (1, 3, 10):
+        assert integral(f"(sin(x)+sin(10*x)/{n})**2", 0, "2*pi") == pytest.approx(math.pi + math.pi / n ** 2)
+
+
+# ---------- TD 3 — Suites d'intégrales ----------
+def test_td_sequences_of_integrals():
+    n = 10 ** 4
+    assert integral(f"{n}*log(1+x/{n})/(1+x**2)**2", 0, "oo") == pytest.approx(0.5, abs=1e-3)
+    assert integral("x/(1+x**2)**2", 0, "oo") == pytest.approx(0.5)
+    assert integral("sin(x)/(10**4+x**2)", 0, "oo", breakpoints=(100,)) == pytest.approx(0, abs=1e-3)
+    assert integral("1/(1+x**2)**400", 0, "oo") == pytest.approx(0, abs=0.05)
+    m = 2000
+    assert m * integral(f"sin(x/{m})/(x*(1+x**2))", 0, "oo", breakpoints=(1,)) == pytest.approx(math.pi / 2, rel=1e-3)
+    for k in (5, 20):  # approximation de Gauss
+        assert integral(f"(1-x**2/{k}**2)**({k}**2)", 0, k) == pytest.approx(math.sqrt(math.pi) / 2, abs=5e-2)
+    assert integral("(1-x**2/40**2)**(40**2)", 0, 40) == pytest.approx(math.sqrt(math.pi) / 2, abs=1e-3)
+    for k in (2, 7):
+        assert integral(f"({k}+1)*x**{k}", 0, 1) == pytest.approx(1)
+
+
+# ---------- Ch5 / TD 4 — Intégrales à paramètre ----------
+def test_gamma_function():
+    for n in range(1, 7):
+        assert integral(f"exp(-x)*x**{n - 1}", 0, "oo") == pytest.approx(math.factorial(n - 1))
+    assert integral("exp(-x)*x**(-Rational(1,2))", 0, "oo") == pytest.approx(math.sqrt(math.pi))
+    for x0 in (0.5, 1.7, 3.2):  # Γ(x + 1) = x Γ(x)
+        assert integral(f"exp(-x)*x**{x0}", 0, "oo") == pytest.approx(x0 * integral(f"exp(-x)*x**({x0}-1)", 0, "oo"))
+    for n, s in [(1, 2.0), (3, 1.5)]:
+        assert integral(f"x**{n}*exp(-{s}*x)", 0, "oo") == pytest.approx(math.factorial(n) / s ** (n + 1))
+
+
+def test_parameter_integral_exercises():
+    def F(xv):  # F(x) = ∫ sin(xt) e^{-t²} dt vérifie F' + x F / 2 = 1/2
+        return integral(f"sin({xv}*x)*exp(-x**2)", 0, "oo")
+    for xv in (0.5, 1.3):
+        h = 1e-4
+        derivative = (F(xv + h) - F(xv - h)) / (2 * h)
+        assert derivative + xv / 2 * F(xv) == pytest.approx(0.5, abs=1e-6)
+        dawson = 0.5 * math.exp(-xv ** 2 / 4) * integral("exp(x**2/4)", 0, xv)
+        assert F(xv) == pytest.approx(dawson)
+    assert integral("x**2", 0, 1) == pytest.approx(1 / 3)
+    eps = 1e-4  # taux d'accroissement de ∫₀^π sin(x sin t) dt
+    assert integral(f"sin({eps}*sin(x))", 0, "pi") / eps == pytest.approx(2, abs=1e-6)
+    for xv in (0.5, 1, 3):
+        assert integral(f"sin(x)/x*exp(-{xv}*x)", 0, "oo") == pytest.approx(math.pi / 2 - math.atan(xv))
+        assert integral(f"exp(-{xv}*x)*sin(x)", 0, "oo") == pytest.approx(1 / (1 + xv ** 2))
+        assert integral(f"(exp(-{xv}*x)-exp(-x))/x", 0, "oo") == pytest.approx(-math.log(xv))
+    assert integral("(exp(-x)-exp(-3*x))/x", 0, "oo") == pytest.approx(math.log(3))
+
+
+def test_gauss_by_the_auxiliary_function():
+    for xv in (0.3, 1.0, 2.0):
+        g = integral(f"exp(-(x**2+1)*{xv}**2)/(1+x**2)", 0, 1)
+        f = integral("exp(-x**2)", 0, xv)
+        assert g + f ** 2 == pytest.approx(math.pi / 4)
+        assert 0 <= g <= math.pi / 4 * math.exp(-xv ** 2)
+    assert integral("exp(-x**2)", 0, "oo") == pytest.approx(math.sqrt(math.pi) / 2)
+    assert integral("exp(-4*x**2)", "-oo", "oo") == pytest.approx(math.sqrt(math.pi / 4))
