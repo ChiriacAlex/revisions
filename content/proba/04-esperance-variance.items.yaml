@@ -1,0 +1,53 @@
+- id: ev-definitions
+  type: truefalse
+  prompt: "Tir à l'arc (score $X$, $P(X = x) = \\frac{21 - 2x}{100}$) et jeux A/B. Vrai ou faux ?"
+  statements:
+    - text: "$E[X] = 3{,}85$"
+      answer: true
+      why: "$\\frac{21 \\times 55 - 2 \\times 385}{100}$."
+      verify: {check: python_expr, expr: "sum(x * counting.Fraction(21 - 2 * x, 100) for x in range(1, 11)) == counting.Fraction(385, 100)"}
+    - text: "$E[X^2] = 18{,}27$ (valeur des slides)"
+      answer: false
+      why: "$E[X^2] = \\frac{21 \\times 385 - 2 \\times 3025}{100} = 20{,}35$."
+      verify: {check: python_expr, expr: "sum(x * x * counting.Fraction(21 - 2 * x, 100) for x in range(1, 11)) == counting.Fraction(1827, 100)"}
+    - text: "L'écart-type du score vaut environ $2{,}35$ points."
+      answer: true
+      why: "$V = 20{,}35 - 3{,}85^2 = 5{,}5275$ et $\\sqrt{5{,}5275} \\approx 2{,}35$."
+      verify: {check: python_expr, expr: "abs(float(counting.variance({x: counting.Fraction(21 - 2 * x, 100) for x in range(1, 11)})) ** 0.5 - 2.351) < 1e-3"}
+    - text: "Le jeu B (1 € ou 9 €) a une variance 16 fois plus grande que le jeu A (4 € ou 6 €)."
+      answer: true
+      why: "$V_B = 16$ et $V_A = 1$."
+      verify: {check: python_expr, expr: "counting.variance({1: counting.Fraction(1, 2), 9: counting.Fraction(1, 2)}) == 16 * counting.variance({4: counting.Fraction(1, 2), 6: counting.Fraction(1, 2)})"}
+    - text: "Les ampoules de type B (80 % à 1000 h, 20 % à 600 h) ont une espérance de 1000 h."
+      answer: false
+      why: "$0{,}8 \\times 1000 + 0{,}2 \\times 600 = 920$ h (erreur des slides)."
+      verify: {check: python_expr, expr: "counting.expectation({1000: counting.Fraction(8, 10), 600: counting.Fraction(2, 10)}) == 1000"}
+- id: ev-existence
+  type: qcm
+  multi: true
+  prompt: "Sur $[1, +\\infty[$ (et $0$ ailleurs), quelles densités donnent une variable qui admet une **variance** ?"
+  options:
+    - text: "$\\frac{1}{x^2}$"
+      why: "Pas même d'espérance : $\\int_1^{\\infty} \\frac{dx}{x}$ diverge."
+    - text: "$\\frac{2}{x^3}$"
+      why: "Espérance $2$, mais $E[X^2] = \\int_1^{\\infty} \\frac{2}{x}\\,dx$ diverge."
+    - text: "$\\frac{3}{x^4}$"
+      correct: true
+      why: "$E[X^2] = \\int_1^{\\infty} \\frac{3}{x^2}\\,dx = 3$ converge."
+    - text: "$\\frac{4}{x^5}$"
+      correct: true
+      why: "$E[X^2] = \\int_1^{\\infty} \\frac{4}{x^3}\\,dx = 2$ converge."
+- id: ev-lois
+  type: numeric
+  prompt: "Ampoules de type A, durée uniforme sur $[900, 1100]$ h. Écart-type (en heures, arrondi à l'unité) ?"
+  answer: 58
+  tolerance: 0.5
+  explanation: "$V = \\frac{(1100 - 900)^2}{12} = \\frac{40\\,000}{12} \\approx 3333$, donc $\\sigma = \\frac{200}{\\sqrt{12}} \\approx 57{,}7$ h."
+  verify: {check: python_expr, expr: "round((200 ** 2 / 12) ** 0.5)"}
+- id: ev-tchebychev
+  type: numeric
+  prompt: "Une variable a pour espérance $50$ et pour écart-type $5$. Selon Tchebychev, quelle est la borne supérieure de $P(|X - 50| \\ge 20)$ ? (décimal)"
+  answer: 0.0625
+  tolerance: 0.0001
+  explanation: "$\\frac{V}{\\varepsilon^2} = \\frac{25}{400} = 0{,}0625$ : au plus 6,25 %, quelle que soit la loi."
+  verify: {check: python_expr, expr: "25 / 20 ** 2"}

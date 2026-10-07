@@ -273,3 +273,71 @@ def test_tdc_extras():
     for t in [1.5, 3, 10]:
         assert abs(1 - 1 / t - I(lambda x: math.exp(-x), 0, math.log(t))) < 1e-9
         assert abs(I(lambda w: 1 / w ** 2, 1, t) - (1 - 1 / t)) < 1e-9
+
+
+# ---------- Ch2 Espérance et variance + TD 2 ----------
+def test_archery_numbers_and_slide_errors():
+    p = {x: Fr(21 - 2 * x, 100) for x in range(1, 11)}
+    assert sum(p.values()) == 1
+    assert counting.expectation(p) == Fr(385, 100)
+    assert sum(x * x * q for x, q in p.items()) == Fr(2035, 100) != Fr(1827, 100)
+    assert counting.variance(p) == Fr(55275, 10000)
+    assert abs(math.sqrt(5.5275) - 2.35) < 1e-2
+    f = lambda x: 8 * x
+    assert abs(I(f, 0, 0.5) - 1) < 1e-12
+    assert abs(I(lambda x: x * f(x), 0, 0.5) - 1 / 3) < 1e-12
+    assert abs(I(lambda x: x * x * f(x), 0, 0.5) - 0.125) < 1e-12
+    assert Fr(1, 8) - Fr(1, 9) == Fr(1, 72) and abs(math.sqrt(1 / 72) - 0.118) < 1e-3
+    assert round(0.125 - 0.33 ** 2, 3) == 0.016  # l'arrondi prématuré des slides
+
+
+def test_games_and_bulbs():
+    A = {4: Fr(1, 2), 6: Fr(1, 2)}
+    B = {1: Fr(1, 2), 9: Fr(1, 2)}
+    assert counting.expectation(A) == counting.expectation(B) == 5
+    assert counting.variance(A) == 1 and counting.variance(B) == 16
+    bulbB = {1000: Fr(8, 10), 600: Fr(2, 10)}
+    assert counting.expectation(bulbB) == 920 and counting.variance(bulbB) == 25600
+    assert abs(200 ** 2 / 12 - 3333.33) < 0.01 and round(math.sqrt(200 ** 2 / 12)) == 58
+
+
+def test_td2_exercise1_tail_densities():
+    # intégrales partielles sur [1, M] comparées aux primitives exactes, puis limites M -> +inf
+    M = 1000.0
+    n = 2_000_000
+    assert abs(I(lambda x: 3 / x ** 4, 1, M, n) - (1 - M ** -3)) < 1e-8          # -> 1 : densité
+    assert abs(I(lambda x: 3 / x ** 3, 1, M, n) - 1.5 * (1 - M ** -2)) < 1e-8    # -> 3/2 = E[X]
+    assert abs(I(lambda x: 3 / x ** 2, 1, M, n) - 3 * (1 - 1 / M)) < 1e-8        # -> 3 = E[X²]
+    assert 3 - 1.5 ** 2 == 0.75 and abs(math.sqrt(0.75) - 0.866) < 1e-3
+    # 1/x² : ∫ x·g = ln M diverge ; 2/x³ : E = 2(1 - 1/M) -> 2 mais E[X²] = 2 ln M diverge
+    assert abs(I(lambda x: 1 / x, 1, M, n) - math.log(M)) < 1e-8
+    assert abs(I(lambda x: 2 / x ** 2, 1, M, n) - 2 * (1 - 1 / M)) < 1e-8
+    assert abs(I(lambda x: 2 / x, 1, M, n) - 2 * math.log(M)) < 1e-8
+
+
+def test_td2_uniform_exponential_normal_moments():
+    assert abs(I(lambda x: x, 0, 1) - 0.5) < 1e-12 and abs(I(lambda x: x * x, 0, 1) - 1 / 3) < 1e-12
+    for a, b in [(2, 8), (-3, 5)]:
+        m = I(lambda x: x / (b - a), a, b)
+        v = I(lambda x: x * x / (b - a), a, b) - m * m
+        assert abs(m - (a + b) / 2) < 1e-9 and abs(v - (b - a) ** 2 / 12) < 1e-9
+    assert abs(I(lambda x: x * math.exp(-x), 0, 80) - 1) < 1e-9
+    assert abs(I(lambda x: x * x * math.exp(-x), 0, 80) - 2) < 1e-8
+    for lam in [0.5, 2, 3]:
+        m = I(lambda x: x * lam * math.exp(-lam * x), 0, 200 / lam)
+        v = I(lambda x: x * x * lam * math.exp(-lam * x), 0, 200 / lam) - m * m
+        assert abs(m - 1 / lam) < 1e-7 and abs(v - 1 / lam ** 2) < 1e-6
+    phi = lambda x: math.exp(-x * x / 2) / math.sqrt(2 * math.pi)
+    assert abs(I(lambda x: x * phi(x), -15, 15)) < 1e-12
+    assert abs(I(lambda x: x * x * phi(x), -15, 15) - 1) < 1e-9
+
+
+def test_td2_law_of_large_numbers_bound():
+    assert 4 / (100 * 0.5 ** 2) == 0.16 and 25 / 20 ** 2 == 0.0625
+    # V(moyenne) = σ²/n pour des dés indépendants (n = 2, calcul exact)
+    die = {k: Fr(1, 6) for k in range(1, 7)}
+    mean2 = {}
+    for a in range(1, 7):
+        for b in range(1, 7):
+            mean2[Fr(a + b, 2)] = mean2.get(Fr(a + b, 2), 0) + Fr(1, 36)
+    assert counting.expectation(mean2) == Fr(7, 2) and counting.variance(mean2) == counting.variance(die) / 2
