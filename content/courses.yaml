@@ -5,3 +5,10 @@
   tags: [preuves, ensembles, fonctions, récurrence, combinatoire, projet Python]
   updated: 2026-10-07
   accent: "#3b4bb8"
+- slug: proba
+  subject: Probabilités et statistiques · EPITA
+  title: Probabilités et statistiques (PBS)
+  description: Variables aléatoires discrètes (prérequis) puis lois continues — densité, fonction de répartition, changement de variable, lois uniforme, exponentielle et normale — avec exercices corrigés.
+  tags: [variables aléatoires, densité, loi normale, exercices corrigés]
+  updated: 2026-10-07
+  accent: "#18907d"

@@ -76,3 +76,41 @@ def every_tournament_has_unique_hamiltonian_path(n):
 
 def every_tournament_has_hamiltonian_cycle(n):
     return all(any((p[-1], p[0]) in t for p in _hamiltonian_paths(n, t)) for t in _tournaments(n))
+
+
+# ---------- Probabilités : outils exacts et numériques ----------
+from fractions import Fraction
+import math
+
+
+def integrate(f, a, b, n=20000):
+    """Intégrale numérique (méthode de Simpson), n pair."""
+    if n % 2:
+        n += 1
+    h = (b - a) / n
+    s = f(a) + f(b)
+    for i in range(1, n):
+        s += (4 if i % 2 else 2) * f(a + i * h)
+    return s * h / 3
+
+
+def Phi(x):
+    """Fonction de répartition de la loi normale centrée réduite."""
+    return 0.5 * (1 + math.erf(x / math.sqrt(2)))
+
+
+def law_of_two_dice_sum():
+    law = {}
+    for a in range(1, 7):
+        for b in range(1, 7):
+            law[a + b] = law.get(a + b, 0) + Fraction(1, 36)
+    return law
+
+
+def expectation(law):
+    return sum(x * p for x, p in law.items())
+
+
+def variance(law):
+    m = expectation(law)
+    return sum((x - m) ** 2 * p for x, p in law.items())

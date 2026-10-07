@@ -1,0 +1,66 @@
+- id: pd-repartition
+  type: numeric
+  prompt: "$X$ est la somme de deux dés équilibrés. Que vaut $F_X(4) = P(X \\le 4)$ ? (fraction ou décimal)"
+  answer: 0.16666666666666666
+  tolerance: 0.001
+  explanation: "Les sommes 2, 3, 4 s'obtiennent de $1 + 2 + 3 = 6$ façons sur 36 : $F_X(4) = \\frac{6}{36} = \\frac{1}{6} \\approx 0{,}167$."
+  verify: {check: python_expr, expr: "float(sum(p for k, p in counting.law_of_two_dice_sum().items() if k <= 4))"}
+- id: pd-esperance
+  type: truefalse
+  prompt: "$X$ est le résultat d'un dé équilibré. Vrai ou faux ?"
+  statements:
+    - text: "$E[X] = 3{,}5$"
+      answer: true
+      why: "$\\frac{1 + \\cdots + 6}{6} = \\frac{21}{6}$."
+      verify: {check: python_expr, expr: "counting.expectation({k: counting.Fraction(1, 6) for k in range(1, 7)}) == counting.Fraction(7, 2)"}
+    - text: "$E[X^2] = E[X]^2$"
+      answer: false
+      why: "$E[X^2] = \\frac{91}{6} \\approx 15{,}17$ alors que $E[X]^2 = 12{,}25$ : leur différence est justement la variance."
+      verify: {check: python_expr, expr: "counting.expectation({k * k: counting.Fraction(1, 6) for k in range(1, 7)}) == counting.Fraction(49, 4)"}
+    - text: "$V(X) = \\frac{35}{12}$"
+      answer: true
+      why: "$\\frac{91}{6} - \\frac{49}{4} = \\frac{182 - 147}{12} = \\frac{35}{12}$, ce qui coïncide avec $\\frac{n^2 - 1}{12}$ pour $n = 6$."
+      verify: {check: python_expr, expr: "counting.variance({k: counting.Fraction(1, 6) for k in range(1, 7)}) == counting.Fraction(35, 12)"}
+    - text: "$V(2X + 1) = 2\\,V(X) + 1$"
+      answer: false
+      why: "$V(aX + b) = a^2 V(X)$ : ici $4 V(X)$. La constante ne change pas la dispersion."
+      verify: {check: python_expr, expr: "counting.variance({2 * k + 1: counting.Fraction(1, 6) for k in range(1, 7)}) == 2 * counting.Fraction(35, 12) + 1"}
+- id: pd-couple
+  type: truefalse
+  prompt: "Pour le couple du § 6 (loi jointe 0,1 / 0,3 / 0,2 / 0,4), vrai ou faux ?"
+  statements:
+    - text: "$X$ et $Y$ sont indépendantes."
+      answer: false
+      why: "$P(X = 0, Y = 0) = 0{,}1 \\neq 0{,}4 \\times 0{,}3 = 0{,}12$."
+      verify: {check: python_expr, expr: "abs(0.1 - 0.4 * 0.3) < 1e-12"}
+    - text: "$\\mathrm{Cov}(X, Y) = -0{,}02$"
+      answer: true
+      why: "$E[XY] - E[X]E[Y] = 0{,}4 - 0{,}6 \\times 0{,}7$."
+      verify: {check: python_expr, expr: "abs((0.4 - 0.6 * 0.7) - (-0.02)) < 1e-12"}
+    - text: "$P(Y = 1 \\mid X = 1) = \\frac{2}{3}$"
+      answer: true
+      why: "$\\frac{0{,}4}{0{,}6}$."
+      verify: {check: python_expr, expr: "abs(0.4 / 0.6 - 2 / 3) < 1e-12"}
+    - text: "Une covariance nulle prouve l'indépendance."
+      answer: false
+      why: "$X$ uniforme sur $\\{-1, 0, 1\\}$ et $Y = X^2$ : covariance nulle, mais $Y$ dépend entièrement de $X$."
+- id: pd-reconnaitre
+  type: qcm
+  prompt: "Un serveur reçoit en moyenne 4 requêtes par seconde, de façon aléatoire et indépendante. Quelle loi modélise le **nombre de requêtes reçues en une seconde** ?"
+  options:
+    - text: "Poisson $\\mathcal{P}(4)$"
+      correct: true
+      why: "Comptage d'événements indépendants sur une durée, avec un taux moyen connu : c'est la situation type de la loi de Poisson."
+    - text: "Géométrique $\\mathcal{G}(1/4)$"
+      why: "La loi géométrique compte un **rang** (le nombre d'essais avant un succès), pas un nombre d'événements sur une durée."
+    - text: "Binomiale $\\mathcal{B}(4, 1/2)$"
+      why: "Rien ne limite le nombre de requêtes à 4 : il peut en arriver 7 ou 10."
+    - text: "Uniforme sur $\\{0, \\ldots, 8\\}$"
+      why: "Les valeurs proches de la moyenne sont bien plus probables que les extrêmes."
+- id: pd-exercices
+  type: numeric
+  prompt: "Exercice 4 (sans remise) : quelle est la probabilité de tirer **au moins un** jeton gagnant ? (décimal)"
+  answer: 0.8333333333333334
+  tolerance: 0.001
+  explanation: "Complémentaire : $1 - P(X = 0) = 1 - \\frac{\\binom{6}{3}}{\\binom{10}{3}} = 1 - \\frac{20}{120} = \\frac{5}{6} \\approx 0{,}833$."
+  verify: {check: python_expr, expr: "1 - comb(6, 3) / comb(10, 3)"}
