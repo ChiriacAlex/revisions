@@ -1,0 +1,42 @@
+- id: ch6-fonction-ou-pas
+  type: qcm
+  multi: true
+  prompt: "Exercice 1 en version rapide : lesquelles de ces relations sont des **fonctions** (de l'ensemble de gauche vers celui de droite) ?"
+  options:
+    - text: "$\\{(x, y) \\in \\mathbb{R}^2 \\mid y = x^2\\}$"
+      correct: true
+      why: "Chaque réel $x$ a exactement une image, $x^2$."
+    - text: "$\\{(x, y) \\in \\mathbb{R}^2 \\mid x^2 + y^2 = 3\\}$"
+      why: "Un cercle : $x = 0$ a deux images, $x = 2$ aucune."
+    - text: "$\\{(E, F) \\in \\mathcal{P}(\\mathbb{N})^2 \\mid E \\subseteq F\\}$"
+      why: "$\\emptyset$ est inclus dans toutes les parties : une infinité d'images."
+    - text: "$\\{(E, F) \\in \\mathcal{P}(\\mathbb{N})^2 \\mid F = E^\\complement\\}$"
+      correct: true
+      why: "Le complémentaire existe et est unique."
+    - text: "$\\{(n, m) \\in \\mathbb{N}^2 \\mid m \\text{ divise } n\\}$"
+      why: "$6$ a pour « images » $1, 2, 3, 6$ ; $0$ en a une infinité."
+    - text: "$\\{(x, y) \\in \\mathbb{Q} \\times \\mathbb{Z} \\mid \\exists z \\in \\mathbb{Z}^*,\\ x = y/z\\}$"
+      why: "$\\frac{1}{2} = \\frac{1}{2} = \\frac{2}{4}$ : $y = 1$ et $y = 2$ conviennent."
+- id: ch6-inj-surj
+  type: truefalse
+  prompt: Vrai ou faux ?
+  statements:
+    - text: "$x \\in \\mathbb{R} \\mapsto x^2 \\in \\mathbb{R}$ est injective."
+      answer: false
+      why: "$f(1) = f(-1)$."
+    - text: "$x \\in \\mathbb{R}_+ \\mapsto x^2 \\in \\mathbb{R}$ est injective."
+      answer: true
+      why: "Si $x^2 = y^2$ avec $x, y \\ge 0$, alors $(x - y)(x + y) = 0$ ; si $x + y = 0$ alors $x = y = 0$, sinon $x = y$. Changer le **domaine** change l'injectivité."
+    - text: "$x \\in \\mathbb{R} \\mapsto x^2 \\in \\mathbb{R}_+$ est surjective."
+      answer: true
+      why: "Pour $y \\ge 0$, $x = \\sqrt{y}$ convient. Changer l'**arrivée** change la surjectivité."
+    - text: "$n \\in \\mathbb{N} \\mapsto n + 1 \\in \\mathbb{N}$ est surjective."
+      answer: false
+      why: "$0$ n'a pas d'antécédent dans $\\mathbb{N}$. (Elle est injective.)"
+    - text: "$n \\in \\mathbb{N} \\mapsto \\lfloor n / 2 \\rfloor \\in \\mathbb{N}$ est surjective."
+      answer: true
+      why: "Pour $m \\in \\mathbb{N}$, $n = 2m$ convient. (Elle n'est pas injective : $0$ et $1$ ont la même image.)"
+    - text: "Si $f \\circ g = \\mathrm{Id}$, alors $f$ est bijective."
+      answer: false
+      why: "Il faut **aussi** $g \\circ f = \\mathrm{Id}$. Contre-exemple : $f(n) = \\lfloor n/2 \\rfloor$, $g(n) = 2n$ sur $\\mathbb{N}$."
+      verify: {check: python_expr, expr: "not (all((2 * n) // 2 == n for n in range(1000)) and 2 * (1 // 2) != 1)"}
