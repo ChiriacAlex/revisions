@@ -32,6 +32,30 @@ export type RawItem =
 
 const isText = (v: unknown): v is string => typeof v === "string" && v.trim().length > 0;
 
+// Entre guillemets doubles, YAML interprète \n, \a, \b, \t, \f, \e, \L, \P… : « $\neg$ » devient
+// « $<saut de ligne>eg$ ». Ces caractères n'ont rien à faire dans un énoncé : on les refuse.
+const CONTROL = /[\u0000-\u0008\u000b-\u001f\u0085\u2028\u2029]/;
+const BROKEN_INLINE_MATH = /(?<!\$)\$(?!\$)[^$]*[\n\t][^$]*\$/;
+
+function findBadEscape(value: unknown): string | undefined {
+  if (typeof value === "string") {
+    if (CONTROL.test(value) || BROKEN_INLINE_MATH.test(value)) return value.slice(0, 60);
+    return undefined;
+  }
+  if (Array.isArray(value)) {
+    for (const v of value) {
+      const bad = findBadEscape(v);
+      if (bad) return bad;
+    }
+  } else if (value && typeof value === "object") {
+    for (const v of Object.values(value)) {
+      const bad = findBadEscape(v);
+      if (bad) return bad;
+    }
+  }
+  return undefined;
+}
+
 export function parseItemsYaml(source: string, file: string): RawItem[] {
   const data = parse(source) as unknown;
   if (!Array.isArray(data)) throw new Error(`${file} : la racine doit être une liste d'exercices`);
@@ -41,6 +65,8 @@ export function parseItemsYaml(source: string, file: string): RawItem[] {
     const fail = (msg: string): never => {
       throw new Error(`${where} : ${msg}`);
     };
+    const bad = findBadEscape(entry);
+    if (bad) fail(`échappement YAML suspect (double les \\ entre guillemets) dans « ${bad.replace(/\s/g, "␣")} »`);
     if (!isText(entry?.id)) fail("id manquant");
     if (!isText(entry.prompt)) fail("prompt manquant");
 

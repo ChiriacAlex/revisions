@@ -664,6 +664,26 @@ button {
 .prose svg .muted-text {
   fill: var(--muted);
 }
+.prose svg .venn-fill {
+  fill: color-mix(in srgb, var(--accent) 38%, transparent);
+}
+.prose svg .bg-fill {
+  fill: var(--bg);
+}
+.prose svg .ok-fill {
+  fill: var(--ok-soft);
+}
+.prose svg .ko-fill {
+  fill: var(--ko-soft);
+}
+.prose svg .text-fill {
+  fill: var(--text);
+}
+.prose figure.venn-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 8px;
+}
 
 /* Encadrés */
 .callout {

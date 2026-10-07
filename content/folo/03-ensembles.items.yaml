@@ -1,0 +1,118 @@
+- id: ch3-parties
+  type: numeric
+  prompt: "Combien d'éléments possède $\\mathcal{P}(\\{1, 2, 3, 4\\})$ ?"
+  answer: 16
+  explanation: "Pour chacun des 4 éléments, on choisit s'il appartient ou non à la partie : $2^4 = 16$ parties, de $\\emptyset$ à $\\{1,2,3,4\\}$."
+  verify: {check: python_expr, expr: "len(counting.powerset([1, 2, 3, 4]))"}
+- id: ch3-egalites
+  type: truefalse
+  prompt: "Pour $A, B \\in \\mathcal{P}(E)$, vrai ou faux en général ?"
+  statements:
+    - text: "$(A \\cap B)^\\complement = A^\\complement \\cap B^\\complement$"
+      answer: false
+      why: "De Morgan échange $\\cap$ et $\\cup$ : $(A \\cap B)^\\complement = A^\\complement \\cup B^\\complement$. Contre-exemple : $E = \\{1, 2\\}$, $A = \\{1\\}$, $B = \\{2\\}$ : à gauche $E$, à droite $\\emptyset$."
+      verify: {check: set_identity, lhs: "~(A & B)", rhs: "~A & ~B", witness: {A: [1], B: [2]}}
+    - text: "$A \\setminus B = A \\cap B^\\complement$"
+      answer: true
+      why: "$x \\in A \\wedge x \\notin B$, c'est exactement $x \\in A \\wedge x \\in B^\\complement$."
+      verify: {check: set_identity, lhs: "A - B", rhs: "A & ~B"}
+    - text: "$A \\subseteq B \\iff A \\cap B^\\complement = \\emptyset$"
+      answer: true
+      why: "« Aucun élément de $A$ n'est hors de $B$ » : c'est la traduction ensembliste de $\\neg(P \\wedge \\neg Q) \\iff (P \\Rightarrow Q)$."
+      verify: {check: set_statement, statement: "(A <= B) == ((A & ~B) == empty)"}
+    - text: "$A \\cup (B \\cap C) = (A \\cup B) \\cap (A \\cup C)$"
+      answer: true
+      why: "Distributivité de $\\cup$ sur $\\cap$, traduction de $P \\vee (Q \\wedge R) \\iff (P \\vee Q) \\wedge (P \\vee R)$."
+      verify: {check: set_identity, lhs: "A | (B & C)", rhs: "(A | B) & (A | C)"}
+    - text: "$A \\setminus B = B \\setminus A$"
+      answer: false
+      why: "La différence n'est pas symétrique : $\\{1\\} \\setminus \\emptyset = \\{1\\}$ mais $\\emptyset \\setminus \\{1\\} = \\emptyset$."
+      verify: {check: set_identity, lhs: "A - B", rhs: "B - A", witness: {A: [1], B: []}}
+- id: ch3-ex3
+  type: truefalse
+  prompt: "Exercice 3 en version auto-corrigée (propriétés 1 à 8). Pour $A, B, C \\in \\mathcal{P}(E)$, vrai ou faux en général ?"
+  statements:
+    - text: "$A = B \\iff A \\cup C = B \\cup C$"
+      answer: false
+      why: "$A = \\{1\\}$, $B = \\emptyset$, $C = \\{1\\}$."
+      verify: {check: set_statement, statement: "(A == B) == ((A | C) == (B | C))", witness: {A: [1], B: [], C: [1]}}
+    - text: "$A = B \\iff A \\cap B = A$"
+      answer: false
+      why: "$A \\cap B = A$ signifie $A \\subseteq B$. Contre-exemple : $A = \\emptyset$, $B = \\{1\\}$."
+      verify: {check: set_statement, statement: "(A == B) == ((A & B) == A)", witness: {A: [], B: [1]}}
+    - text: "$A \\cup B = C \\iff A \\cup C = B$"
+      answer: false
+      why: "$A = \\{1\\}$, $B = \\emptyset$, $C = \\{1\\}$."
+      verify: {check: set_statement, statement: "((A | B) == C) == ((A | C) == B)", witness: {A: [1], B: [], C: [1]}}
+    - text: "$A \\subseteq B \\cup C \\iff (A \\subseteq B) \\vee (A \\subseteq C)$"
+      answer: false
+      why: "$A = \\{1, 2\\}$, $B = \\{1\\}$, $C = \\{2\\}$ : seul le sens $\\Leftarrow$ est vrai."
+      verify: {check: set_statement, statement: "(A <= (B | C)) == ((A <= B) or (A <= C))", witness: {A: [1, 2], B: [1], C: [2]}}
+    - text: "$A \\subseteq B \\cap C \\iff (A \\subseteq B) \\wedge (A \\subseteq C)$"
+      answer: true
+      why: "Être dans $B \\cap C$, c'est être dans $B$ et dans $C$ : le « et » se distribue sur l'inclusion."
+      verify: {check: set_statement, statement: "(A <= (B & C)) == ((A <= B) and (A <= C))"}
+    - text: "$A = B \\iff A \\setminus C = B \\setminus C$"
+      answer: false
+      why: "$A = \\{1\\}$, $B = \\emptyset$, $C = \\{1\\}$ : retirer $C$ efface la différence."
+      verify: {check: set_statement, statement: "(A == B) == ((A - C) == (B - C))", witness: {A: [1], B: [], C: [1]}}
+    - text: "$(A \\subseteq C) \\wedge (B \\subseteq C) \\implies A \\subseteq B$"
+      answer: false
+      why: "$A = \\{1\\}$, $B = \\emptyset$, $C = \\{1\\}$."
+      verify: {check: set_statement, statement: "(not ((A <= C) and (B <= C))) or (A <= B)", witness: {A: [1], B: [], C: [1]}}
+    - text: "$A \\cup B = C \\iff A = C \\setminus B$"
+      answer: false
+      why: "Faux dans les deux sens : $A = B = C = \\{1\\}$ réfute $\\Rightarrow$ ; $B = \\{2\\}$, $C = \\{1\\}$, $A = \\{1\\}$ réfute $\\Leftarrow$."
+      verify: {check: set_statement, statement: "((A | B) == C) == (A == (C - B))", witness: {A: [1], B: [1], C: [1]}}
+- id: ch3-ex4
+  type: truefalse
+  prompt: "Exercice 4 en version auto-corrigée (égalités qui ont un sens). Vrai ou faux en général ?"
+  statements:
+    - text: "$(A \\setminus B) \\cup B = A$"
+      answer: false
+      why: "On obtient $A \\cup B$. Contre-exemple : $A = \\emptyset$, $B = \\{1\\}$."
+      verify: {check: set_identity, lhs: "(A - B) | B", rhs: "A", witness: {A: [], B: [1]}}
+    - text: "$(A \\cup B) \\setminus B = A$"
+      answer: false
+      why: "On obtient $A \\setminus B$. Contre-exemple : $A = B = \\{1\\}$."
+      verify: {check: set_identity, lhs: "(A | B) - B", rhs: "A", witness: {A: [1], B: [1]}}
+    - text: "$(A \\cup B \\cup B) \\setminus B = A \\cup B$"
+      answer: false
+      why: "On obtient $A \\setminus B$. Contre-exemple : $A = \\emptyset$, $B = \\{1\\}$."
+      verify: {check: set_identity, lhs: "(A | B | B) - B", rhs: "A | B", witness: {A: [], B: [1]}}
+    - text: "$(A \\setminus B) \\cup (A \\cap B) = A$"
+      answer: true
+      why: "Un élément de $A$ est soit hors de $B$, soit dans $B$ : disjonction de cas."
+      verify: {check: set_identity, lhs: "(A - B) | (A & B)", rhs: "A"}
+    - text: "$\\emptyset \\cup A = E \\cap A$"
+      answer: true
+      why: "Les deux valent $A$, car $A \\subseteq E$."
+      verify: {check: set_identity, lhs: "empty | A", rhs: "E & A"}
+    - text: "$\\emptyset \\cap A = E \\cup A$"
+      answer: false
+      why: "À gauche $\\emptyset$, à droite $E$ : faux dès que $E \\neq \\emptyset$."
+      verify: {check: set_identity, lhs: "empty & A", rhs: "E | A"}
+    - text: "$A \\cup B = (A \\cup B) \\setminus (A \\cap B)$"
+      answer: false
+      why: "Le membre de droite est la différence symétrique. Contre-exemple : $A = B = \\{1\\}$. L'égalité n'est vraie que si $A \\cap B = \\emptyset$."
+      verify: {check: set_identity, lhs: "A | B", rhs: "(A | B) - (A & B)", witness: {A: [1], B: [1]}}
+- id: ch3-types
+  type: qcm
+  multi: true
+  prompt: "$A$ et $B$ sont des parties de $E$, $x$ un élément de $E$. Quelles écritures sont **mal typées** (dépourvues de sens) ?"
+  options:
+    - text: "$A + B - B = A$"
+      correct: true
+      why: "L'addition et la soustraction portent sur des nombres, pas sur des ensembles."
+    - text: "$B \\setminus A \\iff B \\cap A^\\complement$"
+      correct: true
+      why: "$\\iff$ relie des propositions ; entre deux ensembles, on écrit $=$."
+    - text: "$\\{x\\} \\in \\mathcal{P}(E)$"
+      why: "Bien typé (et vrai) : $\\{x\\}$ est une partie de $E$, donc un élément de $\\mathcal{P}(E)$."
+    - text: "$x \\subseteq A$"
+      correct: true
+      why: "$x$ est un élément, pas un ensemble : on écrit $x \\in A$ ou $\\{x\\} \\subseteq A$."
+    - text: "$A \\subseteq B \\iff A \\cap B^\\complement = \\emptyset$"
+      why: "Bien typé : des deux côtés de $\\iff$ il y a une proposition. Et c'est vrai."
+    - text: "$\\mathrm{Card}(A \\cup B) + \\mathrm{Card}(A \\cap B) = \\mathrm{Card}(A) + \\mathrm{Card}(B)$"
+      why: "Bien typé pour $A$, $B$ finis : on additionne des **nombres** (des cardinaux). C'est même vrai."

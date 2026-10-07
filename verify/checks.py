@@ -129,6 +129,25 @@ def quantified_implication_holds(hyp, concl, predicates, max_domain=3):
     return True
 
 
+def witness_refutes(spec):
+    """Le contre-exemple cité dans l'explication réfute-t-il vraiment l'énoncé ?"""
+    w = spec["witness"]
+    kind = spec["check"]
+    if kind in ("tautology", "equivalent"):
+        env = {k: B(v) for k, v in w.items()}
+        if kind == "tautology":
+            return not _eval_logic(spec["formula"], env)
+        return _eval_logic(spec["lhs"], env) != _eval_logic(spec["rhs"], env)
+    if kind in ("set_identity", "set_statement"):
+        env = {k: S(v) for k, v in w.items()}
+        env["E"] = S(UNIVERSE | frozenset().union(*[frozenset(v) for v in w.values()]))
+        env["empty"] = S()
+        if kind == "set_identity":
+            return _eval_set(spec["lhs"], env) != _eval_set(spec["rhs"], env)
+        return not bool(_eval_set(spec["statement"], env))
+    raise ValueError(f"témoin non géré pour {kind}")
+
+
 def evaluate_check(spec):
     """Renvoie la valeur de vérité (ou le nombre) calculée pour une spécification `verify`."""
     kind = spec["check"]

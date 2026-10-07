@@ -1,0 +1,66 @@
+- id: ch2-negations
+  type: qcm
+  prompt: Quelle est la négation de « s'il pleut, alors je prends mon parapluie » ?
+  options:
+    - text: « S'il ne pleut pas, alors je ne prends pas mon parapluie. »
+      why: "C'est l'*inverse* $\\neg P \\Rightarrow \\neg Q$ : une autre implication, pas la négation."
+      verify: {check: equivalent, lhs: "~(P >> Q)", rhs: "~P >> ~Q"}
+    - text: « Il pleut et je ne prends pas mon parapluie. »
+      correct: true
+      why: "$\\neg(P \\Rightarrow Q) \\iff P \\wedge \\neg Q$ : la seule façon de rompre le contrat est que $P$ soit vraie et $Q$ fausse."
+      verify: {check: equivalent, lhs: "~(P >> Q)", rhs: "P & ~Q"}
+    - text: « Si je prends mon parapluie, alors il pleut. »
+      why: "C'est la *réciproque* $Q \\Rightarrow P$ : elle n'a aucune raison d'être la négation."
+      verify: {check: equivalent, lhs: "~(P >> Q)", rhs: "Q >> P"}
+    - text: « S'il pleut, alors je ne prends pas mon parapluie. »
+      why: "$P \\Rightarrow \\neg Q$ est vraie dès qu'il ne pleut pas, alors que la négation cherchée est fausse dans ce cas."
+      verify: {check: equivalent, lhs: "~(P >> Q)", rhs: "P >> ~Q"}
+- id: ch2-fausses-equivalences
+  type: truefalse
+  prompt: Ces équivalences sont-elles vraies pour **toutes** les propositions $P, Q, R$ ?
+  statements:
+    - text: "$\\neg(P \\wedge Q) \\iff (\\neg P \\vee \\neg Q)$"
+      answer: true
+      why: "C'est une loi de De Morgan."
+      verify: {check: equivalent, lhs: "~(P & Q)", rhs: "~P | ~Q"}
+    - text: "$(P \\Rightarrow Q) \\iff (\\neg Q \\Rightarrow \\neg P)$"
+      answer: true
+      why: "C'est la contraposée, la base de la preuve par contraposée."
+      verify: {check: equivalent, lhs: "P >> Q", rhs: "~Q >> ~P"}
+    - text: "$(P \\Rightarrow Q) \\iff (\\neg P \\Rightarrow \\neg Q)$"
+      answer: false
+      why: "Contre-exemple : $P$ fausse, $Q$ vraie. À gauche : vrai ; à droite : V ⇒ F, faux."
+      verify: {check: equivalent, lhs: "P >> Q", rhs: "~P >> ~Q", witness: {P: false, Q: true}}
+    - text: "$(P \\Rightarrow Q) \\iff (Q \\Rightarrow P)$"
+      answer: false
+      why: "Une implication n'équivaut pas à sa réciproque : avec $P$ fausse et $Q$ vraie, $P \\Rightarrow Q$ est vraie mais $Q \\Rightarrow P$ est fausse."
+      verify: {check: equivalent, lhs: "P >> Q", rhs: "Q >> P", witness: {P: false, Q: true}}
+    - text: "$P \\vee (Q \\wedge R) \\iff (P \\vee Q) \\wedge (P \\vee R)$"
+      answer: true
+      why: "Distributivité de $\\vee$ sur $\\wedge$."
+      verify: {check: equivalent, lhs: "P | (Q & R)", rhs: "(P | Q) & (P | R)"}
+    - text: "$\\big((P \\vee Q) \\Rightarrow R\\big) \\iff \\big((P \\Rightarrow R) \\wedge (Q \\Rightarrow R)\\big)$"
+      answer: true
+      why: "C'est exactement le motif « $\\vee$ en hypothèse » : il faut traiter les deux cas."
+      verify: {check: equivalent, lhs: "(P | Q) >> R", rhs: "(P >> R) & (Q >> R)"}
+    - text: "$\\big((P \\wedge Q) \\Rightarrow R\\big) \\iff \\big((P \\Rightarrow R) \\wedge (Q \\Rightarrow R)\\big)$"
+      answer: false
+      why: "Contre-exemple : $P$ vraie, $Q$ fausse, $R$ fausse. À gauche, l'hypothèse $P \\wedge Q$ est fausse donc c'est vrai ; à droite, $P \\Rightarrow R$ est faux."
+      verify: {check: equivalent, lhs: "(P & Q) >> R", rhs: "(P >> R) & (Q >> R)", witness: {P: true, Q: false, R: false}}
+    - text: "$\\big((P \\wedge Q) \\Rightarrow R\\big) \\iff \\big(P \\Rightarrow (Q \\Rightarrow R)\\big)$"
+      answer: true
+      why: "Supposer « $P$ et $Q$ » revient à supposer $P$, puis $Q$ : c'est pourquoi on peut empiler les hypothèses dans une preuve."
+      verify: {check: equivalent, lhs: "(P & Q) >> R", rhs: "P >> (Q >> R)"}
+- id: ch2-quel-motif
+  type: qcm
+  prompt: "On veut montrer : « pour tout entier $n$, si $n^2$ n'est pas divisible par 3, alors $n$ n'est pas divisible par 3 ». Quel motif est le plus naturel ?"
+  options:
+    - text: Preuve directe en partant de « $n^2$ n'est pas divisible par 3 ».
+      why: "Possible en théorie, mais « ne pas être divisible » est une information pauvre : on ne sait pas quoi en faire."
+    - text: Contraposée.
+      correct: true
+      why: "La contraposée est « si $3 \\mid n$, alors $3 \\mid n^2$ » : avec $n = 3k$, $n^2 = 3 \\cdot 3k^2$, et c'est fini en une ligne."
+    - text: Double implication.
+      why: "L'énoncé est une implication, pas une équivalence : il n'y a qu'un sens à prouver."
+    - text: Disjonction de cas sur la parité de $n$.
+      why: "La parité n'a aucun rapport avec la divisibilité par 3."

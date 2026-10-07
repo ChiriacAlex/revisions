@@ -49,7 +49,7 @@
     - text: "Si $P \\Rightarrow Q$ est vraie et $Q$ est vraie, alors $P$ est vraie."
       answer: false
       why: "Contre-exemple : $P$ fausse, $Q$ vraie. C'est l'erreur de la fausse preuve « $1 = 2 \\Rightarrow 0 = 0$, donc $1 = 2$ »."
-      verify: {check: tautology, formula: "((P >> Q) & Q) >> P"}
+      verify: {check: tautology, formula: "((P >> Q) & Q) >> P", witness: {P: false, Q: true}}
     - text: "Si $P \\Rightarrow Q$ est vraie et $P$ est vraie, alors $Q$ est vraie."
       answer: true
       why: "C'est le *modus ponens* : c'est exactement comme cela qu'on utilise un théorème."
