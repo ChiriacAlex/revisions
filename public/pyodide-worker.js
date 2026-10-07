@@ -1,7 +1,8 @@
 /* Exécute le code Python de l'étudiant + les tests unittest dans un Web Worker module (Pyodide). */
-import { loadPyodide } from "/vendor/pyodide/pyodide.mjs";
+// Chemins relatifs au worker : fonctionne aussi sous un sous-dossier (GitHub Pages).
+import { loadPyodide } from "./vendor/pyodide/pyodide.mjs";
 
-const PYODIDE_URL = self.location.origin + "/vendor/pyodide/";
+const PYODIDE_URL = new URL("./vendor/pyodide/", self.location.href).href;
 let pyodideReady = null;
 
 function boot() {

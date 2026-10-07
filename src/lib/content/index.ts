@@ -1,4 +1,3 @@
-import "server-only";
 import bundle from "@/generated/content.json";
 import type { Chapter, ContentBundle, Course, Item, PyLab } from "./types";
 

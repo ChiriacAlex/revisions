@@ -1,21 +1,20 @@
 # Révisions
 
-Site personnel de révision : cours rédigés, quiz auto-corrigés, TD corrigés, labo Python, protégé par un code PIN.
+Site personnel de révision : cours rédigés, quiz auto-corrigés, TD corrigés, labo Python (Python dans le navigateur).
 
 ## Lancer en local
 
 ```bash
 npm install
-cp .env.example .env.local   # puis renseigner APP_PIN et SESSION_SECRET
 npm run dev                  # http://localhost:3000
 ```
 
-## Accès
+## Publication
 
-- Le PIN est lu dans la variable d'environnement `APP_PIN` (jamais dans le code).
-- Après le PIN, un jeton signé (HS256, `SESSION_SECRET`) est posé en cookie `HttpOnly` pour **1 heure** ; à l'expiration, le PIN est redemandé.
-- Anti-bruteforce : 5 échecs → 15 min de blocage pour le client ; 30 échecs en 1 h (tous clients) → 1 h de blocage.
-- Toutes les pages passent par `src/proxy.ts` **et** sont revérifiées côté serveur (`requireSession`). Le contenu des cours n'est jamais dans les fichiers JavaScript publics (vérifié par un test E2E).
+Le site est **100 % statique et public** (pas de PIN, pas de serveur) : `npm run build` produit le dossier `out/`.
+À chaque `git push` sur `main`, le workflow `.github/workflows/pages.yml` relance les tests, vérifie les
+réponses, construit le site et le publie sur GitHub Pages, à l'adresse `https://<compte>.github.io/<dépôt>/`.
+La progression (quiz réussis, chapitres terminés, code du labo) reste stockée dans le navigateur de chaque visiteur.
 
 ## Ajouter un cours
 
@@ -45,13 +44,7 @@ n'est jamais affiché, une formule LaTeX est invalide, ou un échappement YAML a
 
 ```bash
 npm run check      # contenu + typecheck + lint + tests unitaires + vérification des réponses (pytest)
-npm run test:e2e   # parcours complet sur un build de production (Chrome installé)
+npm run test:e2e   # site statique servi sous /revisions comme sur GitHub Pages (Chrome installé)
 ```
 
 Les tests Python nécessitent un venv : `python3 -m venv .venv && .venv/bin/pip install pytest pyyaml`.
-
-## Déploiement (Vercel)
-
-Variables d'environnement à définir : `APP_PIN`, `SESSION_SECRET` (`openssl rand -base64 48`).
-Le limiteur anti-bruteforce est en mémoire : sur un hébergement serverless il est réinitialisé à chaque
-démarrage d'instance ; un PIN plus long (6 à 8 chiffres) renforce nettement la sécurité.

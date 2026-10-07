@@ -1,9 +1,6 @@
 import Link from "next/link";
-import { requireSession } from "@/lib/auth/dal";
-import { SessionTimer } from "@/components/SessionTimer";
 
-export default async function AppLayout({ children }: { children: React.ReactNode }) {
-  const { expiresAt } = await requireSession();
+export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
       <header className="topbar">
@@ -13,13 +10,6 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           </span>
           Révisions
         </Link>
-        <span className="topbar-spacer" />
-        <SessionTimer expiresAt={expiresAt.toISOString()} />
-        <form action="/logout" method="post">
-          <button type="submit" className="link-button">
-            Déconnexion
-          </button>
-        </form>
       </header>
       {children}
     </>

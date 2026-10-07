@@ -16,6 +16,8 @@ const eslintConfig = defineConfig([
     "public/vendor/**",
     "src/generated/**",
     ".venv/**",
+    ".e2e/**",
+    "test-results/**",
   ]),
 ]);
 
