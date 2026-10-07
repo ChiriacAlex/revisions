@@ -1,0 +1,24 @@
+- id: td3-somme-produit
+  type: numeric
+  prompt: "Deux réels ont pour somme $7$ et pour produit $10$. Quel est le **plus grand** des deux ?"
+  answer: 5
+  explanation: "Ce sont les racines de $t^2 - 7t + 10 = (t - 2)(t - 5)$ : les nombres sont $2$ et $5$."
+  verify: {check: python_expr, expr: "max((7 + (49 - 40) ** 0.5) / 2, (7 - (49 - 40) ** 0.5) / 2)"}
+- id: td3-parties-paires
+  type: numeric
+  prompt: "Combien de parties de cardinal **pair** possède un ensemble à $7$ éléments ?"
+  answer: 64
+  explanation: "$2^{7-1} = 64$ (la moitié des $2^7 = 128$ parties)."
+  verify: {check: python_expr, expr: "sum(1 for X in counting.powerset(range(7)) if len(X) % 2 == 0)"}
+- id: td3-diner
+  type: numeric
+  prompt: "10 amis, 5 invités, et deux amis qui ne se supportent pas ne doivent pas venir ensemble. Combien de listes possibles ?"
+  answer: 196
+  explanation: "Total $\\binom{10}{5} = 252$, moins les listes avec les deux ennemis : $\\binom{8}{3} = 56$. $252 - 56 = 196$."
+  verify: {check: python_expr, expr: "sum(1 for c in counting.combinations(range(10), 5) if not (0 in c and 1 in c))"}
+- id: td3-inclusions
+  type: numeric
+  prompt: "Pour $E$ de cardinal $4$, combien de couples $(X, Y)$ de parties de $E$ vérifient $X \\subseteq Y$ ?"
+  answer: 81
+  explanation: "$3^4 = 81$ : chaque élément est dans $X$, dans $Y \\setminus X$, ou hors de $Y$."
+  verify: {check: python_expr, expr: "sum(1 for X in counting.powerset(range(4)) for Y in counting.powerset(range(4)) if X <= Y)"}

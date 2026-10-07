@@ -536,3 +536,76 @@ def test_td2_triomino_figure_is_a_valid_tiling():
     assert all(len(c) == 3 for c in covered)
     flat = [cell for c in covered for cell in c]
     assert len(flat) == len(set(flat)) == 15 and (0, 0) not in flat
+
+
+# ---------- TD 3 ----------
+def test_td3_sum_product_and_example():
+    for s in range(-6, 7):
+        for p in range(-6, 7):
+            d = s * s - 4 * p
+            real_pairs = {(x, y) for x in [i / 2 for i in range(-30, 31)] for y in [i / 2 for i in range(-30, 31)]
+                          if x + y == s and x * y == p}
+            if d >= 0:
+                x, y = (s + d ** 0.5) / 2, (s - d ** 0.5) / 2
+                assert abs(x + y - s) < 1e-9 and abs(x * y - p) < 1e-9
+            else:
+                assert not real_pairs
+    assert {2, 3} == {(5 + 1) / 2, (5 - 1) / 2}
+
+
+def test_td3_even_odd_subsets_toggle_bijection():
+    for n in range(1, 8):
+        E = list(range(n))
+        a = E[0]
+        toggle = lambda X: X - {a} if a in X else X | {a}
+        even = {X for X in _powerset(E) if len(X) % 2 == 0}
+        odd = {X for X in _powerset(E) if len(X) % 2 == 1}
+        assert folo.is_bijection(toggle, even, odd)
+        assert len(even) == 2 ** (n - 1)
+
+
+def test_td3_even_odd_decomposition_and_functional_equation():
+    f = lambda x: math.exp(x) + x ** 3 - 2 * x * x
+    for i in range(-20, 21):
+        x = i / 5
+        g = (f(x) + f(-x)) / 2
+        h = (f(x) - f(-x)) / 2
+        assert abs(g + h - f(x)) < 1e-9 and abs(g - (f(-x) + f(x)) / 2) < 1e-9
+        assert x * x - x + 1 > 0
+    one = lambda x: 1
+    assert all(one(x) + x * one(1 - x) == 1 + x for x in range(-30, 31))
+
+
+def test_td3_plane_map():
+    for a in range(-2, 3):
+        for b in range(-2, 3):
+            f = lambda x, y: a * x + b * y
+            if (a, b) != (0, 0):
+                assert (b, -a) != (0, 0) and f(b, -a) == f(0, 0)
+            else:
+                assert f(1, 0) == f(0, 0)
+
+
+def test_td3_dinner():
+    lists = list(combinations(range(10), 5))
+    assert len(lists) == 252
+    assert sum(1 for c in lists if (0 in c) == (1 in c)) == 112 == 56 + 56
+    assert sum(1 for c in lists if not (0 in c and 1 in c)) == 196
+
+
+def test_td3_union_cardinalities():
+    U = range(5)
+    for E in _powerset(U):
+        for F in _powerset(U):
+            assert len(E - F) == len(E | F) - len(F)
+            assert len(E | F) <= len(E) + len(F)
+            assert (len(E | F) == len(E) + len(F)) == (len(E & F) == 0)
+
+
+def test_td3_average_subset_and_inclusions():
+    for n in range(0, 9):
+        subsets = _powerset(range(n))
+        assert Fraction(sum(len(F) for F in subsets), len(subsets)) == Fraction(n, 2)
+        assert sum(k * comb(n, k) for k in range(n + 1)) == (n * 2 ** (n - 1) if n else 0)
+        assert sum(1 for X in subsets for Y in subsets if X <= Y) == 3 ** n
+        assert sum(comb(n, k) * 2 ** k for k in range(n + 1)) == 3 ** n
