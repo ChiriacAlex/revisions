@@ -1,0 +1,30 @@
+- id: frac-coeffs
+  type: numeric
+  prompt: "Dans $\\frac{3x + 1}{(x - 1)(x + 2)} = \\frac{A}{x - 1} + \\frac{B}{x + 2}$, que vaut $A$ ? (décimal)"
+  answer: 1.3333333
+  tolerance: 0.001
+  explanation: "Pôle simple : on cache $(x - 1)$ et on remplace $x$ par $1$ : $A = \\frac{3 + 1}{1 + 2} = \\frac{4}{3}$. (Et $B = \\frac{-6 + 1}{-2 - 1} = \\frac{5}{3}$ ; contrôle : $A + B = 3$, le coefficient de $x$.)"
+  verify: {check: python_expr, expr: "calc.limit('(x-1)*(3*x+1)/((x-1)*(x+2))', 1)"}
+- id: frac-integrer
+  type: truefalse
+  prompt: Vrai ou faux ?
+  statements:
+    - text: "$\\int \\frac{dx}{x^2 + 2x + 5} = \\frac{1}{2}\\arctan\\frac{x + 1}{2} + C$"
+      answer: true
+      why: "Forme canonique $(x + 1)^2 + 2^2$, puis $\\int \\frac{du}{u^2 + a^2} = \\frac{1}{a}\\arctan\\frac{u}{a}$."
+      verify: {check: python_expr, expr: "calc.antiderivative_ok('1/(x**2+2*x+5)', 'atan((x+1)/2)/2')"}
+    - text: "$\\int_1^3 \\frac{x^2 + x - 5}{x^2 - 1}\\,dx = 1 + \\frac{7}{2}\\ln 2 - \\frac{5}{2}\\ln 3$ (énoncé du poly)"
+      answer: false
+      why: "L'intégrande a un pôle en $x = 1$ où $\\frac{1}{x - 1}$ n'est pas intégrable : $\\int_1^3$ n'existe pas. Le nombre annoncé est $\\int_2^3$."
+    - text: "$\\int_2^3 \\frac{x^2 + x - 5}{x^2 - 1}\\,dx = 1 + \\frac{7}{2}\\ln 2 - \\frac{5}{2}\\ln 3$"
+      answer: true
+      why: "$\\left[x + \\frac{5}{2}\\ln|x + 1| - \\frac{3}{2}\\ln|x - 1|\\right]_2^3$."
+      verify: {check: python_expr, expr: "abs(calc.integral('(x**2+x-5)/(x**2-1)', 2, 3) - calc.value('1+7*log(2)/2-5*log(3)/2')) < 1e-12"}
+    - text: "Dans la décomposition de $\\frac{4x^3 + 16x^2 + 23x + 13}{(x + 1)^3(x + 2)}$, le coefficient de $\\frac{1}{x + 1}$ vaut $6$."
+      answer: false
+      why: "Il vaut $\\frac{1}{2!}g''(-1) = 3$ ; le poly oublie le $\\frac{1}{2!}$. Contrôle : $A_2 + B$ doit valoir $4$."
+      verify: {check: python_expr, expr: "abs(calc.limit('(x+1)*((4*x**3+16*x**2+23*x+13)/((x+1)**3*(x+2)) - 2/(x+1)**3 - 1/(x+1)**2 - 1/(x+2))', -1) - 6) < 1e-9"}
+    - text: "$I_2 = \\int \\frac{dt}{(1 + t^2)^2} = \\frac{1}{2}\\left(\\frac{t}{1 + t^2} + \\arctan t\\right) + C$"
+      answer: true
+      why: "Récurrence $I_2 = \\frac{1}{2}\\frac{t}{1 + t^2} + \\frac{1}{2}I_1$."
+      verify: {check: python_expr, expr: "calc.antiderivative_ok('1/(1+x**2)**2', '(x/(1+x**2)+atan(x))/2')"}

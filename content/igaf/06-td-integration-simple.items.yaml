@@ -1,0 +1,7 @@
+- id: td1-integration
+  type: numeric
+  prompt: "Intégrales de Wallis : calculer $I_4 = \\int_0^{\\pi/2} \\sin^4 x\\,dx$ (décimal à $10^{-3}$)."
+  answer: 0.5890486
+  tolerance: 0.001
+  explanation: "$I_4 = \\frac{3}{4}I_2 = \\frac{3}{4}\\cdot\\frac{1}{2}I_0 = \\frac{3}{8}\\cdot\\frac{\\pi}{2} = \\frac{3\\pi}{16} \\approx 0{,}589$."
+  verify: {check: python_expr, expr: "calc.integral('sin(x)**4', 0, 'pi/2')"}

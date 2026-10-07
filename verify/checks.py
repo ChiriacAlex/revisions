@@ -6,6 +6,7 @@ coïncider avec la réponse affichée à l'étudiant."""
 from itertools import product, combinations
 from math import comb, factorial
 
+import calculus as calc
 import counting
 import importlib.util
 from pathlib import Path
@@ -188,7 +189,7 @@ def evaluate_check(spec):
         return (quantified_implication_holds(spec["lhs"], spec["rhs"], spec["predicates"], size)
                 and quantified_implication_holds(spec["rhs"], spec["lhs"], spec["predicates"], size))
     if kind == "python_expr":
-        return eval(spec["expr"], {"comb": comb, "factorial": factorial, "counting": counting})
+        return eval(spec["expr"], {"comb": comb, "factorial": factorial, "counting": counting, "calc": calc})
     if kind == "relation":
         # Propriété d'une relation finie, calculée avec la solution de référence du projet (elle-même testée).
         es = set(eval(spec["es"], {"range": range, "frozenset": frozenset}))

@@ -1,0 +1,54 @@
+- id: prim-cv
+  type: truefalse
+  prompt: "Ces primitives sont-elles justes (à une constante près) ?"
+  statements:
+    - text: "$\\int u' \\cos u = -\\sin u$ (tableau du poly)"
+      answer: false
+      why: "$(\\sin u)' = u' \\cos u$ : c'est $+\\sin u$. Le poly inverse les signes de $\\int u'\\cos u$ et $\\int u'\\sin u$."
+      verify: {check: python_expr, expr: "calc.antiderivative_ok('2*x*cos(x**2)', '-sin(x**2)')"}
+    - text: "$\\int \\frac{x\\,dx}{\\sqrt{1 - x^2}} = -\\sqrt{1 - x^2}$"
+      answer: true
+      why: "$u = 1 - x^2$, $du = -2x\\,dx$ : $-\\frac{1}{2}\\int u^{-1/2}\\,du = -\\sqrt{u}$."
+      verify: {check: python_expr, expr: "calc.antiderivative_ok('x/sqrt(1-x**2)', '-sqrt(1-x**2)', points=(-0.5, 0.2, 0.8))"}
+    - text: "$\\int x\\sin(x^2)\\,dx = -\\frac{1}{2}\\cos(x^2)$"
+      answer: true
+      why: "On fait apparaître $u' = 2x$ : $\\frac{1}{2}\\int 2x\\sin(x^2)\\,dx$."
+      verify: {check: python_expr, expr: "calc.antiderivative_ok('x*sin(x**2)', '-cos(x**2)/2')"}
+    - text: "$\\int \\frac{dx}{\\sqrt{x^2 - 4}} = \\ln\\left(\\frac{x}{2} - \\sqrt{\\frac{x^2}{4} - 1}\\right)$ pour $x > 2$"
+      answer: false
+      why: "C'est la formule (fausse) du poly : il faut un $+$, c'est-à-dire $\\operatorname{argch}\\frac{x}{2}$."
+      verify: {check: python_expr, expr: "calc.antiderivative_ok('1/sqrt(x**2-4)', 'log(x/2-sqrt(x**2/4-1))', points=(2.5, 3.0, 5.0))"}
+    - text: "$\\int \\frac{dx}{4 + x^2} = \\frac{1}{2}\\arctan\\frac{x}{2}$"
+      answer: true
+      why: "$\\int \\frac{dx}{a^2 + x^2} = \\frac{1}{a}\\arctan\\frac{x}{a}$ avec $a = 2$."
+      verify: {check: python_expr, expr: "calc.antiderivative_ok('1/(4+x**2)', 'atan(x/2)/2')"}
+- id: prim-ipp
+  type: qcm
+  multi: true
+  prompt: "Quelles primitives sont justes ?"
+  options:
+    - text: "$\\int \\arcsin x\\,dx = x\\arcsin x + \\sqrt{1 - x^2}$"
+      correct: true
+      why: "IPP avec $v' = 1$ puis $\\int \\frac{x}{\\sqrt{1 - x^2}} = -\\sqrt{1 - x^2}$."
+      verify: {check: python_expr, expr: "calc.antiderivative_ok('asin(x)', 'x*asin(x)+sqrt(1-x**2)', points=(-0.5, 0.2, 0.8))"}
+    - text: "$\\int \\arcsin x\\,dx = x\\arcsin x + \\sqrt{1 + x^2}$ (version du poly)"
+      why: "La dérivée de $\\sqrt{1 + x^2}$ est $\\frac{x}{\\sqrt{1 + x^2}}$, qui ne compense pas $\\frac{x}{\\sqrt{1 - x^2}}$."
+      verify: {check: python_expr, expr: "calc.antiderivative_ok('asin(x)', 'x*asin(x)+sqrt(1+x**2)', points=(-0.5, 0.2, 0.8))"}
+    - text: "$\\int x^2 e^{3x}\\,dx = \\left(\\frac{x^2}{3} - \\frac{2x}{9} + \\frac{2}{27}\\right)e^{3x}$"
+      correct: true
+      why: "Deux IPP avec $u = x^2$ puis $u = x$."
+      verify: {check: python_expr, expr: "calc.antiderivative_ok('x**2*exp(3*x)', '(x**2/3-2*x/9+Rational(2,27))*exp(3*x)')"}
+    - text: "$\\int e^x\\sin x\\,dx = \\frac{e^x}{2}(\\sin x + \\cos x)$"
+      why: "Il faut $\\frac{e^x}{2}(\\sin x - \\cos x)$ : dérive pour vérifier."
+      verify: {check: python_expr, expr: "calc.antiderivative_ok('exp(x)*sin(x)', 'exp(x)*(sin(x)+cos(x))/2')"}
+    - text: "$\\int \\ln x\\,dx = x\\ln x - x$"
+      correct: true
+      why: "IPP avec $u = \\ln x$, $v' = 1$."
+      verify: {check: python_expr, expr: "calc.antiderivative_ok('log(x)', 'x*log(x)-x')"}
+- id: prim-definie
+  type: numeric
+  prompt: "Valeur moyenne de $f(x) = \\sin x$ sur $[0, \\pi]$ (décimal à $10^{-3}$)."
+  answer: 0.6366198
+  tolerance: 0.001
+  explanation: "$\\frac{1}{\\pi - 0}\\int_0^\\pi \\sin x\\,dx = \\frac{1}{\\pi}\\big[-\\cos x\\big]_0^\\pi = \\frac{2}{\\pi} \\approx 0{,}637$."
+  verify: {check: python_expr, expr: "calc.integral('sin(x)', 0, 'pi') / calc.value('pi')"}

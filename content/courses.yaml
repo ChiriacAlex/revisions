@@ -12,3 +12,10 @@
   tags: [variables aléatoires, densité, loi normale, exercices corrigés]
   updated: 2026-10-07
   accent: "#18907d"
+- slug: igaf
+  subject: Mathématiques · EPITA
+  title: Intégration et approximation de fonctions (IGAF)
+  description: Prérequis d'analyse, primitives et techniques d'intégration, développements limités, intégrales généralisées, suites d'intégrales (convergence dominée) et intégrales à paramètre — cours, méthodes et TD entièrement corrigés.
+  tags: [primitives, DL, intégrales généralisées, convergence dominée, TD corrigés]
+  updated: 2026-10-07
+  accent: "#b4532a"

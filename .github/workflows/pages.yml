@@ -27,7 +27,7 @@ jobs:
         with:
           python-version: "3.13"
       - run: npm ci
-      - run: python -m pip install pytest pyyaml
+      - run: python -m pip install pytest pyyaml sympy mpmath
       - name: Compiler et valider le contenu
         run: npm run content
       - name: Tests unitaires

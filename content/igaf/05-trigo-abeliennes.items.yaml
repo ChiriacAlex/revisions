@@ -1,0 +1,36 @@
+- id: trig-bioche
+  type: qcm
+  prompt: "Pour $\\int \\frac{\\sin^3 x}{1 + \\cos^2 x}\\,dx$, quel changement de variable les règles de Bioche recommandent-elles ?"
+  options:
+    - text: "$t = \\cos x$"
+      correct: true
+      why: "$\\omega(-x) = \\frac{-\\sin^3 x}{1 + \\cos^2 x}(-dx) = \\omega(x)$ : invariance par $x \\mapsto -x$."
+    - text: "$t = \\sin x$"
+      why: "$\\omega(\\pi - x) = \\frac{\\sin^3 x}{1 + \\cos^2 x}(-dx) = -\\omega(x)$ : pas d'invariance."
+    - text: "$t = \\tan x$"
+      why: "$\\omega(\\pi + x) = \\frac{-\\sin^3 x}{1 + \\cos^2 x}dx = -\\omega(x)$ : pas d'invariance."
+    - text: "$t = \\tan\\frac{x}{2}$"
+      why: "Possible, mais c'est le dernier recours : ici une invariance existe."
+- id: trig-abeliennes
+  type: truefalse
+  prompt: Vrai ou faux ?
+  statements:
+    - text: "$\\int \\sin^2 x\\cos^2 x\\,dx = \\frac{x}{8} - \\frac{\\sin 4x}{32} + C$"
+      answer: true
+      why: "$\\sin^2 x\\cos^2 x = \\frac{\\sin^2 2x}{4} = \\frac{1 - \\cos 4x}{8}$."
+      verify: {check: python_expr, expr: "calc.antiderivative_ok('sin(x)**2*cos(x)**2', 'x/8-sin(4*x)/32')"}
+    - text: "$\\int \\frac{dt}{\\cos^2 t\\,(1 + \\tan t)} = \\ln|\\tan t| + C$ (réponse du poly)"
+      answer: false
+      why: "Avec $u = \\tan t$ on obtient $\\int \\frac{du}{1 + u} = \\ln|1 + \\tan t|$."
+      verify: {check: python_expr, expr: "calc.antiderivative_ok('1/(cos(x)**2*(1+tan(x)))', 'log(abs(tan(x)))', points=(0.2, 0.6, 1.0))"}
+    - text: "$\\int \\frac{dx}{x\\sqrt{x - 1}} = 2\\arctan\\sqrt{x - 1} + C$"
+      answer: true
+      why: "$t = \\sqrt{x - 1}$, $dx = 2t\\,dt$ : $\\int \\frac{2\\,dt}{t^2 + 1}$."
+      verify: {check: python_expr, expr: "calc.antiderivative_ok('1/(x*sqrt(x-1))', '2*atan(sqrt(x-1))', points=(1.5, 3, 7))"}
+    - text: "$\\int \\frac{x^2\\,dx}{\\sqrt{9 - x^2}} = \\frac{9}{2}\\arcsin\\frac{x}{3} - \\frac{x}{2}\\sqrt{9 - x^2} + C$"
+      answer: true
+      why: "$x = 3\\sin t$ puis $\\int 9\\sin^2 t\\,dt = \\frac{9}{2}(t - \\sin t\\cos t)$."
+      verify: {check: python_expr, expr: "calc.antiderivative_ok('x**2/sqrt(9-x**2)', 'Rational(9,2)*asin(x/3)-x*sqrt(9-x**2)/2', points=(0.5, 1.5, 2.5))"}
+    - text: "Pour $\\int \\sqrt{x^2 + 2x + 5}\\,dx$, on pose $x + 1 = 2\\sin\\theta$."
+      answer: false
+      why: "$x^2 + 2x + 5 = (x + 1)^2 + 4$ est de la forme $u^2 + k^2$ : on pose $x + 1 = 2\\sinh\\theta$ (ou $2\\tan\\theta$)."
