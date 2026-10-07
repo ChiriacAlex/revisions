@@ -12,14 +12,14 @@ export function isPinCorrect(input: string, expected: string | undefined): boole
   return timingSafeEqual(digest(candidate), digest(expected));
 }
 
-type LimiterOptions = { maxFailures: number; lockMs: number };
-type Entry = { failures: number; lockedUntil: number };
+type LimiterOptions = { maxFailures: number; lockMs: number; windowMs?: number };
+type Entry = { failures: number; lockedUntil: number; firstFailureAt: number };
 
 /**
  * Anti-bruteforce en mémoire : après `maxFailures` échecs, le client est bloqué `lockMs`.
  * Un PIN à 4 chiffres n'a que 10 000 combinaisons : sans blocage, il se devine en minutes.
  */
-export function createAttemptLimiter({ maxFailures, lockMs }: LimiterOptions) {
+export function createAttemptLimiter({ maxFailures, lockMs, windowMs }: LimiterOptions) {
   const entries = new Map<string, Entry>();
 
   function current(key: string, now: number): Entry | undefined {
@@ -41,7 +41,11 @@ export function createAttemptLimiter({ maxFailures, lockMs }: LimiterOptions) {
       return entry && entry.lockedUntil !== 0 ? entry.lockedUntil - now : 0;
     },
     registerFailure(key: string, now: number = Date.now()): void {
-      const entry = current(key, now) ?? { failures: 0, lockedUntil: 0 };
+      let entry = current(key, now);
+      // Fenêtre glissante simple : des échecs trop anciens (hors verrouillage) sont oubliés.
+      if (!entry || (windowMs !== undefined && entry.lockedUntil === 0 && now - entry.firstFailureAt > windowMs)) {
+        entry = { failures: 0, lockedUntil: 0, firstFailureAt: now };
+      }
       entry.failures += 1;
       if (entry.failures >= maxFailures) entry.lockedUntil = now + lockMs;
       entries.set(key, entry);

@@ -7,7 +7,10 @@ import { SESSION_COOKIE, SESSION_TTL_SECONDS, createSessionToken } from "@/lib/a
 import { configuredPin, sessionSecret } from "@/lib/auth/config";
 import { safeNextPath } from "@/lib/auth/redirect";
 
+// Par client : 5 échecs → 15 min. Global (défense en profondeur) : 30 échecs en 1 h → 1 h de blocage.
 const limiter = createAttemptLimiter({ maxFailures: 5, lockMs: 15 * 60_000 });
+const globalLimiter = createAttemptLimiter({ maxFailures: 30, lockMs: 60 * 60_000, windowMs: 60 * 60_000 });
+const GLOBAL = "global";
 
 export type LoginState = { error?: string };
 
@@ -18,7 +21,7 @@ async function clientKey(): Promise<string> {
 
 export async function login(_prev: LoginState, formData: FormData): Promise<LoginState> {
   const key = await clientKey();
-  const wait = limiter.retryAfterMs(key);
+  const wait = Math.max(limiter.retryAfterMs(key), globalLimiter.retryAfterMs(GLOBAL));
   if (wait > 0) {
     return { error: `Trop d'essais. Réessaie dans ${Math.ceil(wait / 60_000)} min.` };
   }
@@ -26,6 +29,7 @@ export async function login(_prev: LoginState, formData: FormData): Promise<Logi
   const pin = String(formData.get("pin") ?? "");
   if (!isPinCorrect(pin, configuredPin())) {
     limiter.registerFailure(key);
+    globalLimiter.registerFailure(GLOBAL);
     await new Promise((resolve) => setTimeout(resolve, 600));
     return { error: "Code PIN incorrect." };
   }

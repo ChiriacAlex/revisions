@@ -63,3 +63,7 @@ __pycache__/
 
 # runtime Python copié depuis node_modules (npm run content)
 /public/vendor/pyodide/
+
+# résultats Playwright
+/test-results/
+/playwright-report/

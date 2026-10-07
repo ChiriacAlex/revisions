@@ -58,3 +58,24 @@ describe("attempt limiter", () => {
     expect(limiter.isLocked("ip", t0)).toBe(false);
   });
 });
+
+describe("attempt limiter with a time window", () => {
+  const t0 = new Date("2026-10-07T10:00:00Z").getTime();
+
+  it("forgets old failures once the window has passed", () => {
+    const limiter = createAttemptLimiter({ maxFailures: 3, lockMs: 60 * 60_000, windowMs: 60 * 60_000 });
+    limiter.registerFailure("global", t0);
+    limiter.registerFailure("global", t0 + 10 * 60_000);
+    // 2 h plus tard : les deux anciens échecs ne comptent plus
+    limiter.registerFailure("global", t0 + 2 * 60 * 60_000);
+    expect(limiter.isLocked("global", t0 + 2 * 60 * 60_000)).toBe(false);
+  });
+
+  it("locks when the failures happen inside the window", () => {
+    const limiter = createAttemptLimiter({ maxFailures: 3, lockMs: 60 * 60_000, windowMs: 60 * 60_000 });
+    limiter.registerFailure("global", t0);
+    limiter.registerFailure("global", t0 + 1000);
+    limiter.registerFailure("global", t0 + 2000);
+    expect(limiter.isLocked("global", t0 + 3000)).toBe(true);
+  });
+});
