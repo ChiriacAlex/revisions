@@ -119,10 +119,17 @@ def set_statement_holds(statement):
 
 # ---------- Quantificateurs : prédicats unaires arbitraires sur un petit domaine ----------
 def _predicate_models(n, names):
+    """Tous les modèles : un prédicat « P » est une partie de D, un prédicat « R/2 » une partie de D × D."""
     domain = list(range(n))
-    subsets = [frozenset(c) for r in range(n + 1) for c in combinations(domain, r)]
-    for values in product(subsets, repeat=len(names)):
-        yield domain, dict(zip(names, values))
+    pairs = [(x, y) for x in domain for y in domain]
+
+    def extensions(name):
+        base = domain if not name.endswith("/2") else pairs
+        return [frozenset(c) for r in range(len(base) + 1) for c in combinations(base, r)]
+
+    keys = [name.split("/")[0] for name in names]
+    for values in product(*[extensions(name) for name in names]):
+        yield domain, dict(zip(keys, values))
 
 
 def quantified_implication_holds(hyp, concl, predicates, max_domain=3):
@@ -152,10 +159,14 @@ def witness_refutes(spec):
         if kind == "set_identity":
             return _eval_set(spec["lhs"], env) != _eval_set(spec["rhs"], env)
         return not bool(_eval_set(spec["statement"], env))
-    if kind == "quantified_implication":
+    if kind in ("quantified_implication", "quantified_equivalence"):
         env = {"__builtins__": {}, "all": all, "any": any, "D": list(w["D"])}
-        env.update({name: frozenset(w.get(name, [])) for name in spec["predicates"]})
-        return bool(eval(spec["hyp"], env)) and not bool(eval(spec["concl"], env))
+        for name in spec["predicates"]:
+            key = name.split("/")[0]
+            env[key] = frozenset(tuple(v) if isinstance(v, list) else v for v in w.get(key, []))
+        if kind == "quantified_implication":
+            return bool(eval(spec["hyp"], env)) and not bool(eval(spec["concl"], env))
+        return bool(eval(spec["lhs"], env)) != bool(eval(spec["rhs"], env))
     raise ValueError(f"témoin non géré pour {kind}")
 
 
@@ -172,6 +183,10 @@ def evaluate_check(spec):
         return set_statement_holds(spec["statement"])
     if kind == "quantified_implication":
         return quantified_implication_holds(spec["hyp"], spec["concl"], spec["predicates"], spec.get("max_domain", 3))
+    if kind == "quantified_equivalence":
+        size = spec.get("max_domain", 3)
+        return (quantified_implication_holds(spec["lhs"], spec["rhs"], spec["predicates"], size)
+                and quantified_implication_holds(spec["rhs"], spec["lhs"], spec["predicates"], size))
     if kind == "python_expr":
         return eval(spec["expr"], {"comb": comb, "factorial": factorial, "counting": counting})
     if kind == "relation":

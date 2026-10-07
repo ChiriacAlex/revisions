@@ -119,3 +119,50 @@ def test_ch6_affine_inverse_formula():
             for y in range(-20, 21):
                 x = (y - b) / a
                 assert abs(a * x + b - y) < 1e-12
+
+
+# ---------- Ch7 : annale 2022 (fonction d'ordre supérieur g = image directe) ----------
+def _direct_image(f, X):
+    return frozenset(f[x] for x in X)
+
+
+def test_ch7_exam2022_injective_iff_disjoint_images():
+    for E, F in [({0, 1, 2}, {0, 1, 2}), ({0, 1, 2}, {0, 1}), ({0, 1}, {0, 1, 2, 3})]:
+        PE = _powerset(E)
+        for f in _all_functions(E, F):
+            injective = folo.is_injection(lambda x: f[x], set(E), set(F))
+            h = all(not (A & B == frozenset()) or (_direct_image(f, A) & _direct_image(f, B) == frozenset())
+                    for A in PE for B in PE)
+            assert injective == h
+
+
+def test_ch7_converse_holds_for_every_function():
+    E, F = {0, 1, 2}, {0, 1}
+    PE = _powerset(E)
+    for f in _all_functions(E, F):
+        assert all(not (_direct_image(f, A) & _direct_image(f, B) == frozenset()) or (A & B == frozenset())
+                   for A in PE for B in PE)
+
+
+def test_ch7_properties_of_direct_image():
+    E, F = {0, 1, 2}, {0, 1}
+    PE = _powerset(E)
+    for f in _all_functions(E, F):
+        assert _direct_image(f, frozenset()) == frozenset()
+        for x in E:
+            assert _direct_image(f, {x}) == {f[x]}
+        for A in PE:
+            for B in PE:
+                assert _direct_image(f, A | B) == _direct_image(f, A) | _direct_image(f, B)
+                assert _direct_image(f, A & B) <= _direct_image(f, A) & _direct_image(f, B)
+                if A <= B:
+                    assert _direct_image(f, A) <= _direct_image(f, B)
+
+
+def test_ch7_intersection_equality_iff_injective():
+    for E, F in [({0, 1, 2}, {0, 1, 2}), ({0, 1, 2}, {0, 1})]:
+        PE = _powerset(E)
+        for f in _all_functions(E, F):
+            injective = folo.is_injection(lambda x: f[x], set(E), set(F))
+            equality = all(_direct_image(f, A & B) == _direct_image(f, A) & _direct_image(f, B) for A in PE for B in PE)
+            assert injective == equality

@@ -1,0 +1,53 @@
+- id: ch7-ordre
+  type: truefalse
+  prompt: "Vrai ou faux (dans $\\mathbb{N}$) ?"
+  statements:
+    - text: "$\\forall n \\in \\mathbb{N},\\ \\exists m \\in \\mathbb{N},\\ m > n$"
+      answer: true
+      why: "Pour chaque $n$, $m = n + 1$ convient : $m$ dépend de $n$."
+    - text: "$\\exists m \\in \\mathbb{N},\\ \\forall n \\in \\mathbb{N},\\ m > n$"
+      answer: false
+      why: "Ce $m$ devrait vérifier $m > m$. Échanger $\\forall$ et $\\exists$ change le sens."
+    - text: "$\\exists m \\in \\mathbb{N},\\ \\forall n \\in \\mathbb{N},\\ m \\le n$"
+      answer: true
+      why: "$m = 0$ convient."
+    - text: "$\\forall n \\in \\mathbb{N},\\ \\exists m \\in \\mathbb{N},\\ m < n$"
+      answer: false
+      why: "Pour $n = 0$, aucun entier naturel n'est strictement plus petit."
+    - text: "Pour toute relation $R$ : $(\\exists y,\\ \\forall x,\\ R(x, y)) \\Rightarrow (\\forall x,\\ \\exists y,\\ R(x, y))$."
+      answer: true
+      why: "Le $y$ commun à tous les $x$ convient en particulier pour chacun d'eux."
+      verify: {check: quantified_implication, predicates: [R/2], hyp: "any(all((x, y) in R for x in D) for y in D)", concl: "all(any((x, y) in R for y in D) for x in D)"}
+    - text: "Pour toute relation $R$ : $(\\forall x,\\ \\exists y,\\ R(x, y)) \\Rightarrow (\\exists y,\\ \\forall x,\\ R(x, y))$."
+      answer: false
+      why: "Contre-exemple sur $\\{0, 1\\}$ avec $R$ l'égalité : chaque $x$ est égal à lui-même, mais aucun $y$ n'est égal à la fois à $0$ et à $1$."
+      verify: {check: quantified_implication, predicates: [R/2], hyp: "all(any((x, y) in R for y in D) for x in D)", concl: "any(all((x, y) in R for x in D) for y in D)", witness: {D: [0, 1], R: [[0, 0], [1, 1]]}}
+- id: ch7-negations
+  type: qcm
+  prompt: "Quelle est la négation de $\\forall x \\in E,\\ \\exists y \\in F,\\ R(x, y)$ ?"
+  options:
+    - text: "$\\exists x \\in E,\\ \\forall y \\in F,\\ \\neg R(x, y)$"
+      correct: true
+      why: "On échange chaque quantificateur, on garde les domaines, on nie le cœur."
+      verify: {check: quantified_equivalence, predicates: [R/2], lhs: "not all(any((x, y) in R for y in D) for x in D)", rhs: "any(all((x, y) not in R for y in D) for x in D)"}
+    - text: "$\\forall x \\in E,\\ \\exists y \\in F,\\ \\neg R(x, y)$"
+      why: "Les quantificateurs n'ont pas été échangés : ce n'est pas la négation."
+      verify: {check: quantified_equivalence, predicates: [R/2], lhs: "not all(any((x, y) in R for y in D) for x in D)", rhs: "all(any((x, y) not in R for y in D) for x in D)"}
+    - text: "$\\exists x \\in E,\\ \\forall y \\in F,\\ R(x, y)$"
+      why: "Le cœur $R(x, y)$ n'a pas été nié."
+      verify: {check: quantified_equivalence, predicates: [R/2], lhs: "not all(any((x, y) in R for y in D) for x in D)", rhs: "any(all((x, y) in R for y in D) for x in D)"}
+    - text: "$\\exists x \\notin E,\\ \\forall y \\notin F,\\ \\neg R(x, y)$"
+      why: "On ne nie jamais les domaines : « $\\forall x \\in E$ » devient « $\\exists x \\in E$ »."
+- id: ch7-limite
+  type: qcm
+  prompt: "Soit $f : \\mathbb{R} \\to \\mathbb{R}$. Quelle formule signifie « $f$ **n'est pas** majorée » ?"
+  options:
+    - text: "$\\forall M \\in \\mathbb{R},\\ \\exists x \\in \\mathbb{R},\\ f(x) > M$"
+      correct: true
+      why: "Négation de $\\exists M,\\ \\forall x,\\ f(x) \\le M$ : quel que soit le candidat $M$, une valeur le dépasse."
+    - text: "$\\exists M \\in \\mathbb{R},\\ \\forall x \\in \\mathbb{R},\\ f(x) > M$"
+      why: "Ceci dit que $f$ est minorée (strictement) par $M$ : rien à voir."
+    - text: "$\\forall x \\in \\mathbb{R},\\ \\exists M \\in \\mathbb{R},\\ f(x) > M$"
+      why: "Toujours vrai ($M = f(x) - 1$) : la formule ne dit rien."
+    - text: "$\\forall M \\in \\mathbb{R},\\ \\forall x \\in \\mathbb{R},\\ f(x) > M$"
+      why: "Impossible : $f(x)$ devrait dépasser tous les réels, y compris $f(x)$."

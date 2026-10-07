@@ -31,3 +31,15 @@ def test_quantifier_swaps():
         "all(x in P or x in Q for x in D)", "all(x in P for x in D) or all(x in Q for x in D)", ["P", "Q"])
     assert quantified_implication_holds(
         "all(x in P for x in D) or all(x in Q for x in D)", "all(x in P or x in Q for x in D)", ["P", "Q"])
+
+
+def test_binary_predicates_and_quantifier_order():
+    from checks import evaluate_check
+    # ¬(∀x ∃y R(x, y)) ⟺ ∃x ∀y ¬R(x, y)
+    assert evaluate_check({"check": "quantified_equivalence", "predicates": ["R/2"],
+                           "lhs": "not all(any((x, y) in R for y in D) for x in D)",
+                           "rhs": "any(all((x, y) not in R for y in D) for x in D)"})
+    # ∀x ∃y R(x, y) n'implique pas ∃y ∀x R(x, y)
+    assert not evaluate_check({"check": "quantified_implication", "predicates": ["R/2"],
+                               "hyp": "all(any((x, y) in R for y in D) for x in D)",
+                               "concl": "any(all((x, y) in R for x in D) for y in D)"})
