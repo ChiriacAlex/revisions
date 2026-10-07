@@ -1,5 +1,5 @@
 ---
-title: Ch12 — Motifs avancés : analyse-synthèse et bijections d'examen
+title: "Ch12 — Motifs avancés : analyse-synthèse et bijections d’examen"
 summary: Trouver une inconnue par analyse-synthèse, construire et rédiger une bijection d'examen (partiel 2021), méthode quand on est bloqué.
 tags: [analyse-synthèse, bijections, annale, méthode]
 minutes: 50

@@ -62,8 +62,14 @@ export async function buildContent(root: string): Promise<ContentBundle> {
     for (const file of files.filter((f) => f.endsWith(".md"))) {
       const match = file.match(/^(\d+)-(.+)\.md$/);
       if (!match) throw new Error(`${meta.slug}/${file} : nom attendu NN-slug.md`);
-      const { data, content } = matter(await readFile(path.join(dir, file), "utf8"));
       const where = `${meta.slug}/${file}`;
+      let parsed;
+      try {
+        parsed = matter(await readFile(path.join(dir, file), "utf8"));
+      } catch (error) {
+        throw new Error(`${where} : frontmatter invalide (${(error as Error).message.split("\n")[0]}) — mets le titre entre guillemets s'il contient « : »`);
+      }
+      const { data, content } = parsed;
       if (!data.title || !data.summary) throw new Error(`${where} : title et summary obligatoires`);
       const kind = (data.kind ?? "chapter") as ChapterKind;
       if (!KINDS.includes(kind)) throw new Error(`${where} : kind inconnu ${kind}`);
