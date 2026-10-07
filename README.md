@@ -2,19 +2,33 @@
 
 Site personnel de révision : cours rédigés, quiz auto-corrigés, TD corrigés, labo Python (Python dans le navigateur).
 
-## Lancer en local
+## Accès
+
+Le site est protégé par un **code PIN** ; une fois le PIN saisi, la session dure **1 heure** (cookie HttpOnly signé),
+puis le PIN est redemandé. Le PIN et le secret de session sont dans `.env.local` (jamais versionné) :
+
+```bash
+APP_PIN=…
+SESSION_SECRET=…   # >= 32 caractères : openssl rand -base64 48
+```
+
+## Lancer en permanence sur le Mac (Docker + nginx)
+
+```bash
+docker compose up -d --build     # http://localhost:3217
+```
+
+Deux conteneurs : `app` (serveur Next autonome) et `nginx` devant (compression, cache de Python/Pyodide).
+`restart: unless-stopped` : ils redémarrent tout seuls avec Docker Desktop (activer « Start Docker Desktop
+when you sign in » dans ses réglages). Après une modification des cours : relancer la même commande.
+Arrêter : `docker compose down`. Logs : `docker compose logs -f app`.
+
+## Développer
 
 ```bash
 npm install
-npm run dev                  # http://localhost:3000
+npm run dev                  # http://localhost:3000 (lit .env.local)
 ```
-
-## Publication
-
-Le site est **100 % statique et public** (pas de PIN, pas de serveur) : `npm run build` produit le dossier `out/`.
-À chaque `git push` sur `main`, le workflow `.github/workflows/pages.yml` relance les tests, vérifie les
-réponses, construit le site et le publie sur GitHub Pages, à l'adresse `https://<compte>.github.io/<dépôt>/`.
-La progression (quiz réussis, chapitres terminés, code du labo) reste stockée dans le navigateur de chaque visiteur.
 
 ## Ajouter un cours
 
@@ -47,7 +61,9 @@ n'est jamais affiché, une formule LaTeX est invalide, ou un échappement YAML a
 
 ```bash
 npm run check      # contenu + typecheck + lint + tests unitaires + vérification des réponses (pytest)
-npm run test:e2e   # site statique servi sous /revisions comme sur GitHub Pages (Chrome installé)
+npm run test:e2e   # serveur de production (PIN, session, pages, labo Python) avec le Chrome installé
 ```
+
+La CI GitHub (`.github/workflows/ci.yml`) relance ces vérifications à chaque push ; le site n'est plus publié en ligne.
 
 Les tests Python nécessitent un venv : `python3 -m venv .venv && .venv/bin/pip install pytest pyyaml sympy mpmath`.

@@ -55,7 +55,7 @@ export function PyLab({ lab }: { lab: PyLabData }) {
   );
 
   const run = () => {
-    if (!workerRef.current) workerRef.current = new Worker(`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/pyodide-worker.js?v=${WORKER_VERSION}`, { type: "module" });
+    if (!workerRef.current) workerRef.current = new Worker(`/pyodide-worker.js?v=${WORKER_VERSION}`, { type: "module" });
     const worker = workerRef.current;
     const started = performance.now();
     const runId = Math.random().toString(36).slice(2);

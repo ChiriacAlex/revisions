@@ -1,15 +1,25 @@
 import type { NextConfig } from "next";
 
-// Site 100 % statique (GitHub Pages) : `next build` produit le dossier out/.
-// Sur GitHub Pages, le site vit sous /<nom-du-dépôt> : PAGES_BASE_PATH est fourni par le workflow.
-const basePath = process.env.PAGES_BASE_PATH ?? "";
-
+// Serveur Node autonome (output: "standalone") lancé dans Docker sur la machine d'Alex.
+// Toutes les pages dépendent de la session (cookie) : rendu dynamique, protégé par le PIN.
 const nextConfig: NextConfig = {
-  output: "export",
-  basePath,
+  output: "standalone",
+  // Les liens relatifs des cours (« ../primitives/ ») supposent des URL terminées par « / ».
   trailingSlash: true,
-  images: { unoptimized: true },
-  env: { NEXT_PUBLIC_BASE_PATH: basePath },
+  poweredByHeader: false,
+  async headers() {
+    return [
+      {
+        source: "/:path*",
+        headers: [
+          { key: "X-Robots-Tag", value: "noindex, nofollow" },
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "Referrer-Policy", value: "same-origin" },
+          { key: "X-Frame-Options", value: "DENY" },
+        ],
+      },
+    ];
+  },
 };
 
 export default nextConfig;

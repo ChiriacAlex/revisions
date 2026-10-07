@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { getCourse, getCourses } from "@/lib/content";
+import { getCourse } from "@/lib/content";
 import type { ChapterKind } from "@/lib/content/types";
 import { ChapterStatus, CourseProgress } from "@/components/Progress";
 
@@ -13,10 +13,6 @@ const GROUPS: { kind: ChapterKind; label: string }[] = [
   { kind: "exam", label: "Entraînement examen" },
 ];
 
-
-export function generateStaticParams() {
-  return getCourses().map((c) => ({ course: c.slug }));
-}
 
 export async function generateMetadata({ params }: { params: Promise<{ course: string }> }): Promise<Metadata> {
   const course = getCourse((await params).course);

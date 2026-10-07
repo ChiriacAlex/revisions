@@ -1,0 +1,23 @@
+# Lancement : docker compose up -d --build   (tourne en arrière-plan et redémarre avec Docker)
+# Le PIN et le secret de session sont lus dans .env.local (non versionné) : APP_PIN=… et SESSION_SECRET=…
+services:
+  app:
+    build: .
+    image: revisions-app
+    env_file: .env.local
+    environment:
+      # Site servi en HTTP local par nginx : le cookie ne peut pas exiger HTTPS.
+      COOKIE_SECURE: "false"
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:1.29-alpine
+    depends_on:
+      app:
+        condition: service_healthy
+    ports:
+      # Accessible uniquement depuis ce Mac : http://localhost:3217
+      - "127.0.0.1:3217:80"
+    volumes:
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    restart: unless-stopped

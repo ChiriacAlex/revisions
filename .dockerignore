@@ -1,0 +1,15 @@
+node_modules
+.next
+out
+.e2e
+.venv
+.git
+.claude
+.impeccable
+sources
+test-results
+playwright-report
+public/vendor
+src/generated
+.env*
+*.log

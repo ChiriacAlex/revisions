@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { getChapter, getCourses } from "@/lib/content";
+import { getChapter } from "@/lib/content";
 import { ItemView } from "@/components/items/ItemView";
 import { PyLabView } from "@/components/pylab/PyLabView";
 import { DoneToggle } from "@/components/Progress";
@@ -9,10 +9,6 @@ import type { TocEntry } from "@/lib/content/types";
 
 type Params = { course: string; chapter: string };
 
-
-export function generateStaticParams() {
-  return getCourses().flatMap((course) => course.chapters.map((c) => ({ course: course.slug, chapter: c.slug })));
-}
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const { course, chapter } = await params;
