@@ -1,0 +1,6 @@
+- id: demo-q1
+  type: qcm
+  prompt: Vrai ?
+  options:
+    - {text: oui, correct: true, why: ok}
+    - {text: non, why: ko}

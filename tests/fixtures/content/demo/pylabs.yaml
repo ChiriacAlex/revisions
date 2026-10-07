@@ -1,0 +1,8 @@
+- id: demo-lab
+  title: Labo
+  filename: demo.py
+  starter: python/template.py
+  solution: python/solution.py
+  tests: [python/test_demo.py]
+  questions:
+    - {fn: double, title: Doubler}

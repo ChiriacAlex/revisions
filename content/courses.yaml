@@ -1,0 +1,7 @@
+- slug: folo
+  subject: Formalisation logique · EPITA
+  title: Logical Formalism (FOLO)
+  description: Propositions, motifs de preuve, ensembles, quantificateurs, relations, fonctions, récurrence, bijections et dénombrement — cours complet, TD corrigés et projet Python.
+  tags: [preuves, ensembles, fonctions, récurrence, combinatoire, projet Python]
+  updated: 2026-10-07
+  accent: "#3b4bb8"

@@ -1,0 +1,59 @@
+- id: ch1-ensembles
+  type: truefalse
+  prompt: Vrai ou faux ?
+  statements:
+    - text: "$\\{0, 1, 2\\} = \\{2, 1, 0, 2\\}$"
+      answer: true
+      why: Un ensemble n'a ni ordre ni doublon ; seuls comptent ses éléments, ici $0$, $1$ et $2$ dans les deux cas.
+      verify: {check: python_expr, expr: "{0, 1, 2} == {2, 1, 0, 2}"}
+    - text: "$\\{3\\} = 3$"
+      answer: false
+      why: "$\\{3\\}$ est un ensemble (un singleton) qui contient le nombre $3$ ; ce n'est pas le nombre $3$ lui-même."
+    - text: "$\\emptyset = \\{\\emptyset\\}$"
+      answer: false
+      why: "$\\emptyset$ n'a aucun élément ; $\\{\\emptyset\\}$ en a exactement un (l'ensemble vide)."
+      verify: {check: python_expr, expr: "frozenset() == frozenset({frozenset()})"}
+    - text: "$\\{1, \\{1\\}\\}$ a deux éléments."
+      answer: true
+      why: "Ses éléments sont le nombre $1$ et l'ensemble $\\{1\\}$, qui sont deux objets différents."
+      verify: {check: python_expr, expr: "len({1, frozenset({1})}) == 2"}
+- id: ch1-fonctions
+  type: qcm
+  multi: true
+  prompt: Parmi ces procédés, lesquels définissent une **fonction** au sens mathématique ?
+  options:
+    - text: Associer à chaque étudiant d'EPITA sa date de naissance.
+      correct: true
+      why: Chaque étudiant a exactement une date de naissance.
+    - text: "Associer à chaque date l'étudiant né ce jour-là."
+      why: "Pour certaines dates il y a plusieurs étudiants, pour d'autres aucun : une entrée ne donne pas toujours une seule sortie."
+    - text: "Associer à chaque date l'**ensemble** des étudiants nés ce jour-là."
+      correct: true
+      why: "Ici la sortie est un ensemble (éventuellement vide) : chaque date donne exactement un ensemble. Changer le type de sortie peut transformer une non-fonction en fonction."
+    - text: "La fonction `rand()` d'un langage de programmation."
+      why: "Deux appels identiques donnent des résultats différents : ce n'est pas une fonction au sens mathématique (comme `malloc`)."
+    - text: "Associer à un réel $x \\ge 0$ le réel $y$ tel que $y^2 = x$."
+      why: "Pour $x = 4$, il y a deux candidats ($2$ et $-2$) : l'unicité échoue. En imposant $y \\ge 0$ on obtient la racine carrée, qui elle est une fonction."
+- id: ch1-implication
+  type: truefalse
+  prompt: "$P$ et $Q$ sont deux propositions. Vrai ou faux ?"
+  statements:
+    - text: "Si $P$ est fausse, alors $P \\Rightarrow Q$ est vraie, quelle que soit $Q$."
+      answer: true
+      why: "Le contrat « si $P$ alors $Q$ » ne peut être rompu que si $P$ est vraie. C'est la ligne « F ⇒ ? = V » de la table."
+      verify: {check: tautology, formula: "~P >> (P >> Q)"}
+    - text: "Si $Q$ est vraie, alors $P \\Rightarrow Q$ est vraie."
+      answer: true
+      why: "Quand la conclusion est vraie, le contrat est respecté, que $P$ soit vraie ou non."
+      verify: {check: tautology, formula: "Q >> (P >> Q)"}
+    - text: "Si $P \\Rightarrow Q$ est vraie et $Q$ est vraie, alors $P$ est vraie."
+      answer: false
+      why: "Contre-exemple : $P$ fausse, $Q$ vraie. C'est l'erreur de la fausse preuve « $1 = 2 \\Rightarrow 0 = 0$, donc $1 = 2$ »."
+      verify: {check: tautology, formula: "((P >> Q) & Q) >> P"}
+    - text: "Si $P \\Rightarrow Q$ est vraie et $P$ est vraie, alors $Q$ est vraie."
+      answer: true
+      why: "C'est le *modus ponens* : c'est exactement comme cela qu'on utilise un théorème."
+      verify: {check: tautology, formula: "((P >> Q) & P) >> Q"}
+    - text: "« $P \\Rightarrow Q$ » signifie que $P$ est la cause de $Q$."
+      answer: false
+      why: "L'implication est purement contractuelle : « si 1 = 2 alors 0 = 0 » est vraie sans aucun lien de cause à effet."

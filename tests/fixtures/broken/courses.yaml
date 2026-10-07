@@ -1,0 +1,7 @@
+- slug: demo
+  subject: Démo
+  title: Cours de démonstration
+  description: Pour les tests.
+  tags: [test]
+  updated: 2026-10-07
+  accent: "#2f6fdb"

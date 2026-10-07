@@ -1,0 +1,22 @@
+- id: folo-homework
+  title: Projet FOLO
+  filename: folo.py
+  starter: python/folo_template.py
+  solution: python/folo_solution.py
+  tests: [python/folo_test.py, python/folo_extra_test.py]
+  questions:
+    - {fn: is_relation, title: relation binaire}
+    - {fn: is_partial_function, title: fonction partielle}
+    - {fn: is_function, title: fonction}
+    - {fn: is_injection, title: injection}
+    - {fn: is_surjection, title: surjection}
+    - {fn: is_bijection, title: bijection}
+    - {fn: find_inverse, title: réciproque}
+    - {fn: is_symmetric, title: symétrie}
+    - {fn: is_antisymmetric, title: antisymétrie}
+    - {fn: is_reflexive, title: réflexivité}
+    - {fn: is_transitive, title: transitivité}
+    - {fn: is_equivalence, title: relation d'équivalence}
+    - {fn: gen_equiv_class, title: classe d'équivalence}
+    - {fn: is_partial_order, title: relation d'ordre}
+    - {fn: is_total_order, title: ordre total}
