@@ -1,36 +1,57 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Révisions
 
-## Getting Started
+Site personnel de révision : cours rédigés, quiz auto-corrigés, TD corrigés, labo Python, protégé par un code PIN.
 
-First, run the development server:
+## Lancer en local
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+cp .env.example .env.local   # puis renseigner APP_PIN et SESSION_SECRET
+npm run dev                  # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Accès
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- Le PIN est lu dans la variable d'environnement `APP_PIN` (jamais dans le code).
+- Après le PIN, un jeton signé (HS256, `SESSION_SECRET`) est posé en cookie `HttpOnly` pour **1 heure** ; à l'expiration, le PIN est redemandé.
+- Anti-bruteforce : 5 échecs → 15 min de blocage pour le client ; 30 échecs en 1 h (tous clients) → 1 h de blocage.
+- Toutes les pages passent par `src/proxy.ts` **et** sont revérifiées côté serveur (`requireSession`). Le contenu des cours n'est jamais dans les fichiers JavaScript publics (vérifié par un test E2E).
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Ajouter un cours
 
-## Learn More
+1. Déclarer le cours dans `content/courses.yaml` (slug, matière, titre, description, tags, couleur).
+2. Créer `content/<slug>/NN-nom.md` pour chaque partie, avec un frontmatter :
+   ```yaml
+   ---
+   title: "Ch1 — Titre (entre guillemets s'il contient « : »)"
+   summary: Une phrase.
+   kind: chapter   # chapter | sheet | td | project | exam
+   tags: [mot-clé]
+   minutes: 45
+   ---
+   ```
+3. Rédiger en Markdown avec maths `$…$` / `$$…$$` et les encadrés :
+   `:::definition[Titre]`, `:::theorem`, `:::property`, `:::method`, `:::warning`, `:::key`, `:::note`,
+   `:::example`, `:::intuition`, `:::pattern` (motif de preuve), `:::exercise[Titre]`, `:::exam[Titre]`,
+   et les blocs repliés `:::hint[Indice 1]`, `:::correction`, `:::solution`, `:::skeleton`.
+4. Quiz auto-corrigés dans `NN-nom.items.yaml` (types `qcm`, `truefalse`, `numeric`), insérés avec `::item{id="…"}`.
+   Chaque réponse calculable reçoit un champ `verify` (table de vérité, identité ensembliste, dénombrement,
+   expression Python…) recalculé par `npm run verify:py`.
 
-To learn more about Next.js, take a look at the following resources:
+Le build échoue si : une directive est inconnue, un quiz n'a pas de bonne réponse ou d'explication, un quiz
+n'est jamais affiché, une formule LaTeX est invalide, ou un échappement YAML a corrompu une formule.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Vérifications
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+npm run check      # contenu + typecheck + lint + tests unitaires + vérification des réponses (pytest)
+npm run test:e2e   # parcours complet sur un build de production (Chrome installé)
+```
 
-## Deploy on Vercel
+Les tests Python nécessitent un venv : `python3 -m venv .venv && .venv/bin/pip install pytest pyyaml`.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Déploiement (Vercel)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Variables d'environnement à définir : `APP_PIN`, `SESSION_SECRET` (`openssl rand -base64 48`).
+Le limiteur anti-bruteforce est en mémoire : sur un hébergement serverless il est réinitialisé à chaque
+démarrage d'instance ; un PIN plus long (6 à 8 chiffres) renforce nettement la sécurité.
