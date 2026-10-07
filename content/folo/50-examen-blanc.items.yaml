@@ -1,0 +1,28 @@
+- id: exam-logique
+  type: truefalse
+  prompt: "Exercice 1, question 3 : vrai ou faux pour toutes propositions $P, Q$ ?"
+  statements:
+    - text: "$\\big((P \\vee Q) \\wedge \\neg P\\big) \\Rightarrow Q$"
+      answer: true
+      why: "Si $P$ est fausse et $P \\vee Q$ vraie, c'est $Q$ qui est vraie."
+      verify: {check: tautology, formula: "((P | Q) & ~P) >> Q"}
+    - text: "$\\big((P \\Rightarrow Q) \\wedge Q\\big) \\Rightarrow P$"
+      answer: false
+      why: "$P$ fausse, $Q$ vraie."
+      verify: {check: tautology, formula: "((P >> Q) & Q) >> P", witness: {P: false, Q: true}}
+    - text: "$\\big((P \\Rightarrow Q) \\wedge (Q \\Rightarrow R)\\big) \\Rightarrow (P \\Rightarrow R)$"
+      answer: true
+      why: "Transitivité de l'implication (question 2)."
+      verify: {check: tautology, formula: "((P >> Q) & (Q >> R)) >> (P >> R)"}
+- id: exam-denombrement
+  type: numeric
+  prompt: "Exercice 5.1 pour $n = 5$ : combien de couples $(X, Y)$ de parties **disjointes** de $\\{1, \\ldots, 5\\}$ ?"
+  answer: 243
+  explanation: "$3^5 = 243$ : chaque élément est dans $X$, dans $Y$, ou dans aucune des deux."
+  verify: {check: python_expr, expr: "sum(1 for X in counting.powerset(range(5)) for Y in counting.powerset(range(5)) if not (X & Y))"}
+- id: exam-comite
+  type: numeric
+  prompt: "Exercice 5.3 : comités de 4 parmi 12 contenant au moins Alice ou Bob."
+  answer: 285
+  explanation: "$\\binom{12}{4} - \\binom{10}{4} = 495 - 210 = 285$."
+  verify: {check: python_expr, expr: "sum(1 for c in counting.combinations(range(12), 4) if 0 in c or 1 in c)"}

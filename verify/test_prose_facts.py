@@ -609,3 +609,34 @@ def test_td3_average_subset_and_inclusions():
         assert sum(k * comb(n, k) for k in range(n + 1)) == (n * 2 ** (n - 1) if n else 0)
         assert sum(1 for X in subsets for Y in subsets if X <= Y) == 3 ** n
         assert sum(comb(n, k) * 2 ** k for k in range(n + 1)) == 3 ** n
+
+
+# ---------- Examen blanc ----------
+def test_exam_ex3_swap_bijection_and_union_map():
+    f = lambda n: n + 1 if n % 2 == 0 else n - 1
+    assert all(f(f(n)) == n and f(n) >= 0 for n in range(2000))
+    E = frozenset(range(3))
+    for A in _powerset(E):
+        g = lambda X: X | A
+        injective = folo.is_injection(g, set(_powerset(E)), set(_powerset(E)))
+        surjective = folo.is_surjection(g, set(_powerset(E)), set(_powerset(E)))
+        assert injective == (A == frozenset()) == surjective
+
+
+def test_exam_ex4_formulas():
+    assert all(sum(2 ** k for k in range(n + 1)) == 2 ** (n + 1) - 1 for n in range(100))
+    u = 2
+    for n in range(60):
+        assert u == 2 ** n + 1
+        u = 2 * u - 1
+    for n in range(12, 300):
+        assert any(4 * a + 5 * b == n for a in range(n // 4 + 1) for b in range(n // 5 + 1))
+    assert not any(4 * a + 5 * b == 11 for a in range(3) for b in range(3))
+
+
+def test_exam_ex5_counts():
+    for n in range(1, 7):
+        subsets = _powerset(range(n))
+        assert sum(1 for X in subsets for Y in subsets if not (X & Y)) == 3 ** n
+        assert sum(1 for X in subsets if len(X) >= 2) == 2 ** n - n - 1
+    assert comb(12, 4) == 495 and comb(10, 4) == 210 and comb(10, 3) == 120 and comb(10, 2) == 45
