@@ -122,3 +122,87 @@ def test_ex5_poisson_approximation():
 
 def test_ex6_geometric():
     assert abs(0.7 ** 3 - 0.343) < 1e-12 and abs(0.7 ** 5 / 0.7 ** 2 - 0.343) < 1e-12
+
+
+# ---------- Lois continues ----------
+I = counting.integrate
+Phi = counting.Phi
+
+
+def test_density_examples():
+    assert abs(I(lambda x: 3 * x * x, 0, 1) - 1) < 1e-12
+    assert abs(I(lambda x: 3 * x * x, 0.5, 1) - 7 / 8) < 1e-12
+    assert abs(I(lambda x: 0.75 * (1 - x * x), -1, 1) - 1) < 1e-12
+    assert abs(I(lambda x: 2 / x ** 3, 1, 4000, 800000) - 1) < 1e-6
+
+
+def test_cdf_x3_median_and_central_interval():
+    m = 2 ** (-1 / 3)
+    assert abs(m ** 3 - 0.5) < 1e-12 and abs(m - 0.794) < 1e-3
+    a, b = 0.025 ** (1 / 3), 0.975 ** (1 / 3)
+    assert abs(a - 0.292) < 1e-3 and abs(b - 0.992) < 1e-3
+    assert abs(I(lambda x: 3 * x * x, a, b) - 0.95) < 1e-9
+
+
+def test_square_of_uniform_density():
+    # Y = X², X ~ U([-1, 1]) : F_Y(t) = sqrt(t), f_Y(t) = 1/(2 sqrt t)
+    for t in [0.01, 0.2, 0.5, 0.9]:
+        mc = sum(1 for i in range(200001) if (-1 + 2 * i / 200000) ** 2 <= t) / 200001
+        assert abs(mc - math.sqrt(t)) < 1e-3
+    # f_Y = F_Y' : dérivée numérique de sqrt(t), et intégrale exacte 1 - sqrt(eps) -> 1
+    for t in [0.01, 0.3, 0.8]:
+        h = 1e-6
+        assert abs((math.sqrt(t + h) - math.sqrt(t - h)) / (2 * h) - 1 / (2 * math.sqrt(t))) < 1e-5
+    assert abs(I(lambda u: 1.0, 0, 1) - 1) < 1e-12  # changement de variable u = sqrt(t)
+
+
+def test_uniform_moments():
+    a, b = 2.0, 7.0
+    f = lambda x: 1 / (b - a)
+    m = I(lambda x: x * f(x), a, b)
+    v = I(lambda x: x * x * f(x), a, b) - m * m
+    assert abs(m - (a + b) / 2) < 1e-9 and abs(v - (b - a) ** 2 / 12) < 1e-9
+
+
+def test_exponential_facts():
+    lam = 0.5
+    f = lambda t: lam * math.exp(-lam * t)
+    assert abs(I(f, 0, 200) - 1) < 1e-9
+    assert abs(I(lambda t: t * f(t), 0, 200) - 1 / lam) < 1e-6
+    assert abs(I(lambda t: t * t * f(t), 0, 200) - 2 / lam ** 2 - 0) < 1e-5  # E[T²] = 2/λ²
+    assert abs(math.exp(-lam * 3) - 0.2231) < 1e-4
+    assert abs(1 - math.exp(-lam * (math.log(2) / lam)) - 0.5) < 1e-12
+    for t0 in [0.5, 2, 5]:
+        for dt in [0.1, 1, 3]:
+            assert abs(math.exp(-lam * (t0 + dt)) / math.exp(-lam * t0) - math.exp(-lam * dt)) < 1e-12
+
+
+def test_inverse_transform_sampling():
+    lam = 1.7
+    for i in range(1, 1000):
+        u = i / 1000
+        t = -math.log(1 - u) / lam
+        assert abs((1 - math.exp(-lam * t)) - u) < 1e-12
+
+
+def test_normal_table_and_rules():
+    assert round(Phi(1), 4) == 0.8413 and round(Phi(1.96), 4) == 0.9750
+    assert round(Phi(2), 4) == 0.9772 and round(Phi(3), 4) == 0.9987
+    assert round(2 * Phi(1) - 1, 3) == 0.683 and round(2 * Phi(2) - 1, 3) == 0.954
+    assert round(2 * Phi(3) - 1, 3) == 0.997 and abs(2 * Phi(1.96) - 1 - 0.95) < 1e-3
+    phi = lambda x: math.exp(-x * x / 2) / math.sqrt(2 * math.pi)
+    assert abs(I(phi, -12, 12) - 1) < 1e-10
+    for u in [0.3, 1, 2.5]:
+        assert abs(Phi(-u) - (1 - Phi(u))) < 1e-12
+
+
+def test_heights_example():
+    m, s = 175, 7
+    assert abs(Phi((182 - m) / s) - Phi((168 - m) / s) - 0.6827) < 1e-4
+    lo, hi = m - 1.96 * s, m + 1.96 * s
+    assert round(lo, 1) == 161.3 and round(hi, 1) == 188.7
+
+
+def test_gamma_function_factorial():
+    for n in range(1, 10):
+        assert abs(math.gamma(n) - math.factorial(n - 1)) < 1e-6

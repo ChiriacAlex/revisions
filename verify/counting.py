@@ -114,3 +114,27 @@ def expectation(law):
 def variance(law):
     m = expectation(law)
     return sum((x - m) ** 2 * p for x, p in law.items())
+
+
+def is_sigma_algebra(omega, family):
+    fam = {frozenset(s) for s in family}
+    om = frozenset(omega)
+    if frozenset() not in fam:
+        return False
+    if any(om - A not in fam for A in fam):
+        return False
+    return all(A | B in fam for A in fam for B in fam)  # univers fini : unions finies suffisent
+
+
+def check_affine_cdf(a, b):
+    """Compare F_Y(t) = 1 - F_X((b - t)/(-a)) ... pour a < 0, sur une loi exponentielle de référence."""
+    FX = lambda x: 0.0 if x < 0 else 1 - math.exp(-x)
+    for i in range(-40, 41):
+        t = i / 4
+        # F_Y(t) par définition : P(aX + b <= t) = P(X >= (t - b)/a) = 1 - F_X((t - b)/a) (X continue)
+        c = (t - b) / a
+        direct = 1 - FX(c)
+        formula = 1 - FX((5 - t) / 2) if (a, b) == (-2, 5) else None
+        if formula is None or abs(direct - formula) > 1e-12:
+            return False
+    return True

@@ -1,0 +1,69 @@
+- id: pc-tribu
+  type: truefalse
+  prompt: "Sur $\\Omega = \\{1, 2, 3, 4\\}$, ces familles sont-elles des tribus ?"
+  statements:
+    - text: "$\\{\\emptyset, \\{1, 2\\}, \\{3, 4\\}, \\Omega\\}$"
+      answer: true
+      why: "Elle contient $\\emptyset$, elle est stable par complémentaire ($\\{1,2\\} \\leftrightarrow \\{3,4\\}$) et par union."
+      verify: {check: python_expr, expr: "counting.is_sigma_algebra({1, 2, 3, 4}, [set(), {1, 2}, {3, 4}, {1, 2, 3, 4}])"}
+    - text: "$\\{\\emptyset, \\{1\\}, \\Omega\\}$"
+      answer: false
+      why: "Le complémentaire $\\{2, 3, 4\\}$ de $\\{1\\}$ manque."
+      verify: {check: python_expr, expr: "counting.is_sigma_algebra({1, 2, 3, 4}, [set(), {1}, {1, 2, 3, 4}])"}
+    - text: "$\\{\\emptyset, \\{1\\}, \\{2\\}, \\{2, 3, 4\\}, \\{1, 3, 4\\}, \\Omega\\}$"
+      answer: false
+      why: "$\\{1\\} \\cup \\{2\\} = \\{1, 2\\}$ manque : pas stable par union."
+      verify: {check: python_expr, expr: "counting.is_sigma_algebra({1, 2, 3, 4}, [set(), {1}, {2}, {2, 3, 4}, {1, 3, 4}, {1, 2, 3, 4}])"}
+    - text: "$\\mathcal{P}(\\Omega)$"
+      answer: true
+      why: "Toutes les parties : c'est la plus grande tribu."
+      verify: {check: python_expr, expr: "counting.is_sigma_algebra({1, 2, 3, 4}, [set(s) for s in counting.powerset([1, 2, 3, 4])])"}
+- id: pc-densite
+  type: numeric
+  prompt: "Pour quelle valeur de $k$ la fonction $f(x) = \\frac{k}{x^3}$ si $x \\ge 1$, $0$ sinon, est-elle une densité ?"
+  answer: 2
+  explanation: "$\\int_1^{+\\infty} \\frac{k}{x^3}\\,dx = k\\left[-\\frac{1}{2x^2}\\right]_1^{+\\infty} = \\frac{k}{2}$, qui vaut 1 pour $k = 2$ (et $k \\ge 0$ assure la positivité)."
+  verify: {check: python_expr, expr: "round(1 / counting.integrate(lambda x: 1 / x ** 3, 1, 2000, 400000), 3)"}
+- id: pc-repartition
+  type: numeric
+  prompt: "$X$ a pour densité $f(x) = 3x^2$ sur $[0, 1]$. Que vaut $P(0{,}5 \\le X \\le 0{,}8)$ ? (3 décimales)"
+  answer: 0.387
+  tolerance: 0.001
+  explanation: "$F(0{,}8) - F(0{,}5) = 0{,}8^3 - 0{,}5^3 = 0{,}512 - 0{,}125 = 0{,}387$."
+  verify: {check: python_expr, expr: "round(counting.integrate(lambda x: 3 * x * x, 0.5, 0.8), 3)"}
+- id: pc-changement
+  type: qcm
+  prompt: "$X$ a pour fonction de répartition $F_X$ (variable continue) et $Y = -2X + 5$. Que vaut $F_Y(t)$ ?"
+  options:
+    - text: "$1 - F_X\\!\\left(\\frac{5 - t}{2}\\right)$"
+      correct: true
+      why: "$-2X + 5 \\le t \\iff X \\ge \\frac{5 - t}{2}$ (on divise par $-2$ : l'inégalité s'inverse), et $P(X \\ge c) = 1 - F_X(c)$ car $X$ est continue."
+      verify: {check: python_expr, expr: "counting.check_affine_cdf(-2, 5)"}
+    - text: "$F_X\\!\\left(\\frac{t - 5}{-2}\\right)$"
+      why: "C'est oublier d'inverser l'inégalité en divisant par un nombre négatif."
+    - text: "$-2 F_X(t) + 5$"
+      why: "On ne transforme pas $F$ comme $X$ : cette expression n'est même pas entre 0 et 1."
+    - text: "$\\frac{1}{2} F_X\\!\\left(\\frac{5 - t}{2}\\right)$"
+      why: "Le facteur $\\frac{1}{|a|}$ apparaît sur la **densité**, pas sur la fonction de répartition."
+- id: pc-lois
+  type: truefalse
+  prompt: Vrai ou faux ?
+  statements:
+    - text: "Si $T \\sim \\mathcal{E}(0{,}5)$ (en minutes), $P(T > 3) = e^{-1{,}5} \\approx 0{,}223$."
+      answer: true
+      why: "$P(T > t) = e^{-\\lambda t} = e^{-0{,}5 \\times 3}$."
+      verify: {check: python_expr, expr: "abs(__import__('math').exp(-1.5) - 0.2231) < 1e-4"}
+    - text: "Pour $X \\sim \\mathcal{N}(175, 7^2)$, $P(168 \\le X \\le 182) \\approx 0{,}683$."
+      answer: true
+      why: "$2\\Phi(1) - 1 \\approx 0{,}6827$."
+      verify: {check: python_expr, expr: "abs(2 * counting.Phi(1) - 1 - 0.6827) < 1e-4"}
+    - text: "Dans $\\mathcal{N}(m, \\sigma^2)$, le second paramètre est l'écart-type."
+      answer: false
+      why: "C'est la **variance** $\\sigma^2$ : $\\mathcal{N}(175, 49)$ a un écart-type de 7."
+    - text: "Une densité est toujours inférieure ou égale à 1."
+      answer: false
+      why: "$\\mathcal{U}([0, \\frac{1}{4}])$ a pour densité 4 sur son intervalle ; seules les aires sont des probabilités."
+      verify: {check: python_expr, expr: "abs(counting.integrate(lambda x: 4.0, 0, 0.25) - 1) < 1e-9 and 4 <= 1"}
+    - text: "Si $U \\sim \\mathcal{U}([0, 1])$, alors $25 + 5U \\sim \\mathcal{U}([25, 30])$."
+      answer: true
+      why: "$a + (b - a)U$ avec $a = 25$, $b = 30$."
