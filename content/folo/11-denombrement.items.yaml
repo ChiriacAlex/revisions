@@ -1,0 +1,33 @@
+- id: ch11-kebab
+  type: numeric
+  prompt: "Chez O'Zaman (2 pains, 3 viandes, 4 sauces), combien de sandwichs complets **sans poulet ou sans ketchup** ?"
+  answer: 22
+  explanation: "Complémentaire : sur les $24$ complets, seuls $2 \\times 1 \\times 1 = 2$ ont à la fois du poulet et du ketchup. $24 - 2 = 22$."
+  verify: {check: count, fn: kebab_full_without_chicken_or_ketchup}
+- id: ch11-mots
+  type: numeric
+  prompt: "Combien de mots binaires de longueur $6$ contiennent exactement deux 1 ?"
+  answer: 15
+  explanation: "Un tel mot est déterminé par les positions de ses deux 1 : une partie à 2 éléments de $\\{1, \\ldots, 6\\}$, soit $\\binom{6}{2} = 15$."
+  verify: {check: count, fn: binary_words_with_ones, args: {length: 6, ones: 2}}
+- id: ch11-chemins
+  type: numeric
+  prompt: "Combien de chemins (pas vers la droite ou vers le haut uniquement) traversent une grille de $3 \\times 4$ cases, du coin en bas à gauche au coin en haut à droite (3 cases en largeur, 4 en hauteur) ?"
+  answer: 35
+  explanation: "7 pas dont 3 vers la droite : $\\binom{7}{3} = 35$."
+  verify: {check: count, fn: lattice_paths, args: {right: 3, up: 4}}
+- id: ch11-ordre
+  type: qcm
+  prompt: "On tire 3 cartes d'un jeu de 32 et on s'intéresse à la **main** obtenue (l'ordre de tirage n'importe pas). Combien de mains possibles ?"
+  options:
+    - text: "$\\binom{32}{3} = 4960$"
+      correct: true
+      why: "Une main est une partie à 3 éléments de l'ensemble des 32 cartes."
+      verify: {check: python_expr, expr: "comb(32, 3) == 4960"}
+    - text: "$32 \\times 31 \\times 30 = 29760$"
+      why: "C'est le nombre de tirages **ordonnés** : chaque main est comptée $3! = 6$ fois."
+      verify: {check: python_expr, expr: "comb(32, 3) == 32 * 31 * 30"}
+    - text: "$32^3 = 32768$"
+      why: "Ce serait avec remise et avec ordre : on pourrait tirer trois fois la même carte."
+    - text: "$2^{32}$"
+      why: "C'est le nombre de **toutes** les parties du jeu, de n'importe quelle taille."

@@ -258,3 +258,36 @@ def test_ch10_zigzag_bijection_n_to_z():
     g = lambda z: 2 * z if z >= 0 else -2 * z - 1
     assert all(g(f(n)) == n for n in range(5000))
     assert all(f(g(z)) == z for z in range(-2500, 2500))
+
+
+# ---------- Ch11 ----------
+import counting
+from math import comb
+
+
+def test_ch11_kebab_three_answers_and_breakdowns():
+    assert counting.kebab_full() == 24
+    assert counting.kebab_partial() == 16 == 6 + 8 + 2
+    assert counting.kebab_full_without_chicken_or_ketchup() == 22 == 16 + 18 - 12
+
+
+def test_ch11_binary_words_and_paths():
+    assert counting.binary_words(4) == 16
+    assert [counting.binary_words_with_ones(4, i) for i in range(5)] == [1, 4, 6, 4, 1]
+    assert counting.total_ones(4) == 32
+    assert counting.lattice_paths(5, 5) == 252 == comb(10, 5)
+    assert counting.lattice_paths(4, 4) == 70
+
+
+def test_ch11_sum_of_binomials_and_inclusion_exclusion():
+    for n in range(15):
+        assert sum(comb(n, k) for k in range(n + 1)) == 2 ** n
+    U = range(5)
+    for A in _powerset(U):
+        for B in _powerset(U):
+            assert len(A | B) == len(A) + len(B) - len(A & B)
+
+
+def test_ch11_delegates():
+    assert len([(d, s) for d in range(30) for s in range(30) if d != s]) == 870
+    assert comb(30, 3) == 4060
