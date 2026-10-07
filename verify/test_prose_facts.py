@@ -361,3 +361,38 @@ def test_ch13_injections_count_arrangements():
         for p in range(1, n + 1):
             tuples = [t for t in product(range(n), repeat=p) if len(set(t)) == p]
             assert len(tuples) == math.factorial(n) // math.factorial(n - p)
+
+
+# ---------- TD 1 ----------
+from checks import are_equivalent
+
+
+def test_td1_sin_shift_and_errors():
+    for i in range(-50, 51):
+        x = i / 7
+        assert abs(math.sin(x + math.pi) + math.sin(x)) < 1e-12
+    assert abs(math.sin(math.pi)) < 1e-12
+    assert abs(math.sin(math.pi / 2 + math.pi / 2) - (math.sin(math.pi / 2) + math.sin(math.pi / 2))) > 1
+
+
+def test_td1_exp_unbounded():
+    for M in [1, 10, 1e3, 1e6]:
+        x = math.log(M) + 1
+        assert math.exp(x) > M
+
+
+def test_td1_digit_sum_rule():
+    for n in range(20000):
+        s = sum(int(c) for c in str(n))
+        assert (n % 3 == 0) == (s % 3 == 0)
+        assert (n - s) % 9 == 0
+
+
+def test_td1_negations():
+    assert are_equivalent("~(P >> (Q & ~(R | S)))", "P & (~Q | R | S)")
+    assert are_equivalent("~iff(P | Q, R)", "iff(P | Q, ~R)")
+    assert are_equivalent("~iff(P | Q, R)", "((P | Q) & ~R) | (~P & ~Q & R)")
+
+
+def test_td1_isosceles_negation_is_scalene():
+    assert are_equivalent("~(P | Q | R)", "~P & ~Q & ~R")

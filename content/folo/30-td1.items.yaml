@@ -1,0 +1,62 @@
+- id: td1-fausses-preuves
+  type: qcm
+  prompt: "Dans l'exercice 3, quelle est **l'erreur de fond** ?"
+  options:
+    - text: "Le majorant $M = e^{x+1}$ dépend de $x$ : on a prouvé $\\forall x,\\ \\exists M$ au lieu de $\\exists M,\\ \\forall x$."
+      correct: true
+      why: "C'est une erreur d'ordre des quantificateurs : un majorant doit être le même pour tous les $x$."
+    - text: "L'exponentielle n'est pas strictement croissante."
+      why: "Elle l'est ; cette étape est juste."
+    - text: "Il fallait prendre $M = e^{x+2}$."
+      why: "Le problème n'est pas la valeur de $M$, mais sa dépendance en $x$."
+    - text: "Il n'y a pas d'erreur : l'exponentielle est majorée."
+      why: "Pour tout $M > 0$, $x = \\ln(M) + 1$ vérifie $e^x > M$."
+- id: td1-ex4
+  type: truefalse
+  prompt: "Pour $A, B, X \\in \\mathcal{P}(E)$, vrai ou faux en général ?"
+  statements:
+    - text: "$(A \\cap X = B) \\iff (B \\subseteq X) \\wedge (X \\subseteq B \\cup A^\\complement) \\wedge (B \\subseteq A)$"
+      answer: true
+      why: "C'est l'exercice 4 (vérifié ici sur toutes les parties d'un univers à 3 éléments)."
+      verify: {check: set_statement, statement: "((A & C) == B) == ((B <= C) and (C <= (B | ~A)) and (B <= A))"}
+    - text: "$(A \\cap X = B) \\iff (B \\subseteq X) \\wedge (B \\subseteq A)$"
+      answer: false
+      why: "Il manque $X \\subseteq B \\cup A^\\complement$ : avec $A = X = \\{1\\}$ et $B = \\emptyset$, on a $B \\subseteq X$ et $B \\subseteq A$, mais $A \\cap X = \\{1\\} \\neq B$."
+      verify: {check: set_statement, statement: "((A & C) == B) == ((B <= C) and (B <= A))", witness: {A: [1], B: [], C: [1]}}
+- id: td1-ex5-ex6
+  type: truefalse
+  prompt: "Exercices 5 et 6 : ces implications sont-elles toujours vraies ?"
+  statements:
+    - text: "$\\big((\\forall x,\\ P(x)) \\vee (\\forall x,\\ Q(x))\\big) \\Rightarrow \\big(\\forall x,\\ P(x) \\vee Q(x)\\big)$"
+      answer: true
+      why: "Disjonction de cas sur l'hypothèse."
+      verify: {check: quantified_implication, predicates: [P, Q], hyp: "all(x in P for x in D) or all(x in Q for x in D)", concl: "all(x in P or x in Q for x in D)"}
+    - text: "$\\big(\\forall x,\\ P(x) \\vee Q(x)\\big) \\Rightarrow \\big((\\forall x,\\ P(x)) \\vee (\\forall x,\\ Q(x))\\big)$"
+      answer: false
+      why: "Pair / impair sur $\\mathbb{N}$."
+      verify: {check: quantified_implication, predicates: [P, Q], hyp: "all(x in P or x in Q for x in D)", concl: "all(x in P for x in D) or all(x in Q for x in D)", witness: {D: [0, 1], P: [0], Q: [1]}}
+    - text: "$\\big(\\exists x,\\ P(x) \\wedge Q(x)\\big) \\Rightarrow \\big((\\exists x,\\ P(x)) \\wedge (\\exists x,\\ Q(x))\\big)$"
+      answer: true
+      why: "Le même témoin sert deux fois."
+      verify: {check: quantified_implication, predicates: [P, Q], hyp: "any(x in P and x in Q for x in D)", concl: "any(x in P for x in D) and any(x in Q for x in D)"}
+    - text: "$\\big((\\exists x,\\ P(x)) \\wedge (\\exists x,\\ Q(x))\\big) \\Rightarrow \\big(\\exists x,\\ P(x) \\wedge Q(x)\\big)$"
+      answer: false
+      why: "Pair / impair : deux témoins différents."
+      verify: {check: quantified_implication, predicates: [P, Q], hyp: "any(x in P for x in D) and any(x in Q for x in D)", concl: "any(x in P and x in Q for x in D)", witness: {D: [0, 1], P: [0], Q: [1]}}
+- id: td1-ex12
+  type: qcm
+  prompt: "Quelle est la négation de $A \\Rightarrow (B \\wedge \\neg(C \\vee D))$ ?"
+  options:
+    - text: "$A \\wedge (\\neg B \\vee C \\vee D)$"
+      correct: true
+      why: "$\\neg(A \\Rightarrow R) \\iff A \\wedge \\neg R$, puis De Morgan."
+      verify: {check: equivalent, lhs: "~(P >> (Q & ~(R | S)))", rhs: "P & (~Q | R | S)"}
+    - text: "$\\neg A \\Rightarrow (\\neg B \\vee C \\vee D)$"
+      why: "La négation d'une implication n'est pas une implication."
+      verify: {check: equivalent, lhs: "~(P >> (Q & ~(R | S)))", rhs: "~P >> (~Q | R | S)"}
+    - text: "$A \\wedge (\\neg B \\wedge C \\wedge D)$"
+      why: "De Morgan transforme $\\neg(B \\wedge \\neg C \\wedge \\neg D)$ en un **ou** : $\\neg B \\vee C \\vee D$."
+      verify: {check: equivalent, lhs: "~(P >> (Q & ~(R | S)))", rhs: "P & (~Q & R & S)"}
+    - text: "$\\neg A \\wedge (\\neg B \\vee C \\vee D)$"
+      why: "L'hypothèse $A$ reste vraie dans la négation : c'est la seule façon de rompre l'implication."
+      verify: {check: equivalent, lhs: "~(P >> (Q & ~(R | S)))", rhs: "~P & (~Q | R | S)"}
