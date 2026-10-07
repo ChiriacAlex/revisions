@@ -1,5 +1,5 @@
 """Dénombrements par force brute (énumération explicite), indépendants des formules du cours."""
-from itertools import combinations, product, permutations
+from itertools import combinations, product, permutations  # noqa: F401
 
 
 def powerset(items):
@@ -53,3 +53,26 @@ def folo_is_injection_on_empty():
     """Toute fonction ∅ → F est injective (vérifié avec la solution de référence du projet)."""
     from checks import folo
     return all(folo.is_injection(lambda x: x, set(), F) for F in [set(), {1}, {1, 2}])
+
+
+# ---------- TD 2 : tournois (road trip) ----------
+def _tournaments(n):
+    pairs = [(i, j) for i in range(n) for j in range(i + 1, n)]
+    for orient in product([0, 1], repeat=len(pairs)):
+        yield {(i, j) if o == 0 else (j, i) for (i, j), o in zip(pairs, orient)}
+
+
+def _hamiltonian_paths(n, edges):
+    return [p for p in permutations(range(n)) if all((p[k], p[k + 1]) in edges for k in range(n - 1))]
+
+
+def every_tournament_has_hamiltonian_path(n):
+    return all(_hamiltonian_paths(n, t) for t in _tournaments(n))
+
+
+def every_tournament_has_unique_hamiltonian_path(n):
+    return all(len(_hamiltonian_paths(n, t)) == 1 for t in _tournaments(n))
+
+
+def every_tournament_has_hamiltonian_cycle(n):
+    return all(any((p[-1], p[0]) in t for p in _hamiltonian_paths(n, t)) for t in _tournaments(n))

@@ -396,3 +396,143 @@ def test_td1_negations():
 
 def test_td1_isosceles_negation_is_scalene():
     assert are_equivalent("~(P | Q | R)", "~P & ~Q & ~R")
+
+
+# ---------- TD 2 ----------
+def test_td2_bernoulli_numerically():
+    for xi in range(-10, 60):
+        x = xi / 10
+        if x < -1:
+            continue
+        for n in range(30):
+            assert (1 + x) ** n >= 1 + n * x - 1e-9
+
+
+def _binary_decomposition(n):
+    """Algorithme de la preuve : retirer la plus grande puissance de 2."""
+    B = set()
+    while n > 0:
+        l = max(k for k in range(n.bit_length() + 1) if 2 ** k <= n)
+        assert n - 2 ** l < 2 ** l and l not in B
+        B.add(l)
+        n -= 2 ** l
+    return B
+
+
+def test_td2_binary_decomposition_algorithm():
+    for n in range(5000):
+        B = _binary_decomposition(n)
+        assert sum(2 ** k for k in B) == n
+        assert B == {k for k in range(n.bit_length()) if n >> k & 1}
+
+
+def _tile(n, missing, origin=(0, 0)):
+    """Pavage récursif de la preuve : renvoie la liste des triominos (ensembles de 3 cases)."""
+    if n == 1:
+        r0, c0 = origin
+        return [{(r0 + dr, c0 + dc) for dr in (0, 1) for dc in (0, 1)} - {missing}]
+    half = 2 ** (n - 1)
+    r0, c0 = origin
+    quadrants = [(r0, c0), (r0, c0 + half), (r0 + half, c0), (r0 + half, c0 + half)]
+    centers = [(r0 + half - 1, c0 + half - 1), (r0 + half - 1, c0 + half), (r0 + half, c0 + half - 1), (r0 + half, c0 + half)]
+    tiles, central = [], set()
+    for (qr, qc), center in zip(quadrants, centers):
+        inside = qr <= missing[0] < qr + half and qc <= missing[1] < qc + half
+        hole = missing if inside else center
+        if not inside:
+            central.add(center)
+        tiles += _tile(n - 1, hole, (qr, qc))
+    return tiles + [central]
+
+
+def test_td2_triomino_tiling_for_every_missing_cell():
+    for n in range(1, 5):
+        size = 2 ** n
+        for r in range(size):
+            for c in range(size):
+                tiles = _tile(n, (r, c))
+                cells = [cell for t in tiles for cell in t]
+                assert all(len(t) == 3 for t in tiles)
+                assert len(cells) == len(set(cells)) == size * size - 1
+                assert (r, c) not in set(cells)
+                for t in tiles:  # chaque pièce est un L : contenue dans un carré 2x2
+                    rows = {x for x, _ in t}
+                    cols = {y for _, y in t}
+                    assert max(rows) - min(rows) == 1 and max(cols) - min(cols) == 1
+
+
+def test_td2_four_power_minus_one():
+    assert all((4 ** n - 1) % 3 == 0 for n in range(200))
+
+
+def _insert_route(edges, order):
+    """Récurrence simple : insertion de chaque nouvelle ville dans l'itinéraire."""
+    path = []
+    for c in order:
+        if not path or (c, path[0]) in edges:
+            path.insert(0, c)
+        elif (path[-1], c) in edges:
+            path.append(c)
+        else:
+            i = max(k for k in range(len(path)) if (path[k], c) in edges)
+            assert (c, path[i + 1]) in edges
+            path.insert(i + 1, c)
+    return path
+
+
+def _pivot_route(edges, cities):
+    """Récurrence forte : pivot, A (mènent au pivot), B (atteintes depuis le pivot)."""
+    if not cities:
+        return []
+    pivot, rest = cities[-1], cities[:-1]
+    A = [c for c in rest if (c, pivot) in edges]
+    B = [c for c in rest if (pivot, c) in edges]
+    assert len(A) + len(B) == len(rest)
+    return _pivot_route(edges, A) + [pivot] + _pivot_route(edges, B)
+
+
+def test_td2_road_trip_both_algorithms():
+    for n in range(1, 7):
+        for t in counting._tournaments(n):
+            for route in (_insert_route(t, list(range(n))), _pivot_route(t, list(range(n)))):
+                assert sorted(route) == list(range(n))
+                assert all((route[k], route[k + 1]) in t for k in range(n - 1))
+
+
+def _cells_of_path(d, origin=5, size=30):
+    """Cases (ligne, colonne) couvertes par un polygone SVG orthogonal « M x,y H… V… Z »."""
+    import re
+    tokens = re.findall(r"([MHV])\s*([\d.]+)(?:,([\d.]+))?", d)
+    x = y = None
+    pts = []
+    for cmd, a, b in tokens:
+        if cmd == "M":
+            x, y = float(a), float(b)
+        elif cmd == "H":
+            x = float(a)
+        else:
+            y = float(a)
+        pts.append((x, y))
+
+    def inside(px, py):
+        crossings = 0
+        for (x1, y1), (x2, y2) in zip(pts, pts[1:] + pts[:1]):
+            if (y1 > py) != (y2 > py) and px < x1 + (py - y1) * (x2 - x1) / (y2 - y1):
+                crossings += 1
+        return crossings % 2 == 1
+
+    return {(r, c) for r in range(4) for c in range(4)
+            if inside(origin + size * c + size / 2, origin + size * r + size / 2)}
+
+
+def test_td2_triomino_figure_is_a_valid_tiling():
+    import re
+    from pathlib import Path
+    md = (Path(__file__).resolve().parent.parent / "content" / "folo" / "31-td2.md").read_text()
+    figure = md[md.index("<figure>"):md.index("</figure>")]
+    pieces = re.findall(r'<path d="(M[^"]+? Z)" class="(?:accent-fill|ok-fill)"', figure)
+    assert len(pieces) == 5
+    covered = [_cells_of_path(d) for d in pieces]
+    assert all(len(c) == 3 for c in covered)
+    flat = [cell for c in covered for cell in c]
+    assert len(flat) == len(set(flat)) == 15 and (0, 0) not in flat

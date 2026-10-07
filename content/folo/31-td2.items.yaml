@@ -1,0 +1,65 @@
+- id: td2-ex1
+  type: qcm
+  multi: true
+  prompt: "Exercice 1 : quelles relations sont des **fonctions** telles quelles (sans restreindre le domaine) ?"
+  options:
+    - text: "$n \\sim (p, q) \\iff n = p + q$"
+      why: "$1$ a deux images, $(0, 1)$ et $(1, 0)$."
+    - text: "$E \\sim m \\iff m = \\min E$ (sur $\\mathcal{P}(\\mathbb{N})$)"
+      why: "$\\emptyset$ n'a pas de minimum ; il faut retirer $\\emptyset$ du domaine."
+    - text: "$u \\sim g \\iff \\forall x,\\ g(x) = x + u$"
+      correct: true
+      why: "Chaque $u$ donne une unique translation ; c'est même injectif."
+    - text: "$u \\sim E \\iff \\forall n \\in E,\\ u \\mid n$"
+      why: "$\\emptyset$ et $\\{0\\}$ sont deux images de tout $u$."
+    - text: "$g \\sim h \\iff \\forall x,\\ h(x) = g(x)^2$"
+      correct: true
+      why: "$h = g^2$ est unique ; ni injective ($g$ et $-g$) ni surjective (pas de $h < 0$)."
+- id: td2-binaire
+  type: numeric
+  prompt: "La décomposition binaire de $n = 77$ est $B = \\{k_1, \\ldots, k_r\\}$. Combien d'éléments a $B$ ?"
+  answer: 4
+  explanation: "$77 = 64 + 8 + 4 + 1 = 2^6 + 2^3 + 2^2 + 2^0$, donc $B = \\{0, 2, 3, 6\\}$ : 4 éléments (le nombre de 1 dans $1001101_2$). L'algorithme de la preuve retire à chaque étape la plus grande puissance de 2 possible : $77 \\to 13 \\to 5 \\to 1 \\to 0$."
+  verify: {check: python_expr, expr: "bin(77).count('1')"}
+- id: td2-caracteristiques
+  type: truefalse
+  prompt: "Pour $U, V \\subseteq F$, vrai ou faux ?"
+  statements:
+    - text: "$\\chi_{U \\cap V} = \\chi_U \\cdot \\chi_V$"
+      answer: true
+      why: "Le produit vaut 1 exactement quand les deux valent 1."
+      verify: {check: python_expr, expr: "all((u and v) == u * v for u in (0, 1) for v in (0, 1))"}
+    - text: "$\\chi_{U \\cup V} = \\chi_U + \\chi_V$"
+      answer: false
+      why: "Pour $x \\in U \\cap V$, la somme vaut 2. Il faut retirer $\\chi_U \\chi_V$."
+      verify: {check: python_expr, expr: "all(int(u or v) == u + v for u in (0, 1) for v in (0, 1))"}
+    - text: "$\\chi_{U^\\complement} = 1 - \\chi_U$"
+      answer: true
+      why: "$x \\notin U$ ssi $\\chi_U(x) = 0$ ssi $1 - \\chi_U(x) = 1$."
+      verify: {check: python_expr, expr: "all(int(not u) == 1 - u for u in (0, 1))"}
+    - text: "$\\chi_{U \\setminus V} = \\chi_U (1 - \\chi_V)$"
+      answer: true
+      why: "$U \\setminus V = U \\cap V^\\complement$, puis produit."
+      verify: {check: python_expr, expr: "all(int(u and not v) == u * (1 - v) for u in (0, 1) for v in (0, 1))"}
+- id: td2-triominos
+  type: numeric
+  prompt: "Combien de triominos faut-il pour paver une grille $2^4 \\times 2^4$ privée d'une case ?"
+  answer: 85
+  explanation: "$\\frac{4^4 - 1}{3} = \\frac{255}{3} = 85$ : chaque triomino couvre 3 cases et il y en a $256 - 1 = 255$."
+  verify: {check: python_expr, expr: "(4 ** 4 - 1) // 3"}
+- id: td2-road-trip
+  type: truefalse
+  prompt: "Road trip (tournois). Vrai ou faux ?"
+  statements:
+    - text: "Dans tout pays de 5 villes vérifiant l'hypothèse, il existe un itinéraire passant par toutes les villes."
+      answer: true
+      why: "C'est l'exercice 8 (vérifié ici sur les 1024 pays possibles à 5 villes)."
+      verify: {check: python_expr, expr: "counting.every_tournament_has_hamiltonian_path(5)"}
+    - text: "L'itinéraire est toujours unique."
+      answer: false
+      why: "Avec 3 villes en cycle $C_1 \\to C_2 \\to C_3 \\to C_1$, il y a trois itinéraires ($C_1 C_2 C_3$, $C_2 C_3 C_1$, $C_3 C_1 C_2$)."
+      verify: {check: python_expr, expr: "counting.every_tournament_has_unique_hamiltonian_path(3)"}
+    - text: "Il existe toujours un itinéraire qui revient à la ville de départ (circuit passant par toutes les villes)."
+      answer: false
+      why: "Si $C_1 \\to C_2$, $C_1 \\to C_3$, $C_2 \\to C_3$, aucune route ne revient à $C_1$."
+      verify: {check: python_expr, expr: "counting.every_tournament_has_hamiltonian_cycle(3)"}
