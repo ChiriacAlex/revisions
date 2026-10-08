@@ -3,19 +3,9 @@
 import { useState } from "react";
 import type { Item } from "@/lib/content/types";
 import { itemKey, useStored, type ItemRecord } from "@/lib/storage";
+import { formatAnswer, isAccepted, parseAnswer } from "@/lib/numeric";
 
 type Numeric = Extract<Item, { type: "numeric" }>;
-
-function parseNumber(raw: string): number | null {
-  const cleaned = raw.replace(/\s/g, "").replace(",", ".");
-  if (!cleaned) return null;
-  if (/^-?\d+\/\d+$/.test(cleaned)) {
-    const [a, b] = cleaned.split("/").map(Number);
-    return b === 0 ? null : a / b;
-  }
-  const value = Number(cleaned);
-  return Number.isFinite(value) ? value : null;
-}
 
 export function NumericItem({ item }: { item: Numeric }) {
   const [record, setRecord] = useStored<ItemRecord | null>(itemKey(item.id), null);
@@ -25,9 +15,8 @@ export function NumericItem({ item }: { item: Numeric }) {
   const submitted = draft === null && record !== null;
 
   const check = () => {
-    const n = parseNumber(value);
-    if (n === null) return;
-    const good = Math.abs(n - item.answer) <= item.tolerance + 1e-9;
+    if (parseAnswer(value) === null) return;
+    const good = isAccepted(value, item.answer, item.tolerance);
     setRecord({ status: good ? "ok" : "ko", at: Date.now(), answer: value });
     setDraft(null);
   };
@@ -51,12 +40,12 @@ export function NumericItem({ item }: { item: Numeric }) {
         <input
           inputMode="decimal"
           value={value}
-          placeholder="Ta réponse"
+          placeholder="ex. 1/6 ou 0,167"
           aria-label="Ta réponse"
           onChange={(e) => setDraft(e.target.value)}
         />
         {item.unit && <span>{item.unit}</span>}
-        <button className="btn" type="submit" disabled={parseNumber(value) === null || submitted}>
+        <button className="btn" type="submit" disabled={parseAnswer(value) === null || submitted}>
           Vérifier
         </button>
         {!submitted && !revealed && (
@@ -65,12 +54,17 @@ export function NumericItem({ item }: { item: Numeric }) {
           </button>
         )}
       </form>
+      {!submitted && <p className="numeric-hint">Fraction (1/6) ou décimal (0,167) : les deux sont acceptés.</p>}
       {(submitted || revealed) && (
-        <div className={`feedback ${submitted ? record!.status : "ko"}`}>
+        <div className={`feedback ${submitted ? record!.status : "reveal"}`}>
           {submitted ? (
-            <strong>{record!.status === "ok" ? "Exact." : `Non : la bonne réponse est ${item.answer}.`}</strong>
+            <strong>
+              {record!.status === "ok"
+                ? "Exact."
+                : `Non : la bonne réponse est ${formatAnswer(item.answer, item.tolerance)}.`}
+            </strong>
           ) : (
-            <strong>Réponse : {item.answer}.</strong>
+            <strong>Solution : {formatAnswer(item.answer, item.tolerance)}</strong>
           )}
           <div className="explain" dangerouslySetInnerHTML={{ __html: item.explanationHtml }} />
         </div>

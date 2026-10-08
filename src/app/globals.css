@@ -936,6 +936,17 @@ button {
   color: var(--text);
   border: 1px solid color-mix(in srgb, var(--ko) 45%, transparent);
 }
+/* Solution affichée via « Je bloque » : neutre, ce n'est pas un échec. */
+.feedback.reveal {
+  background: var(--surface-2);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+.numeric-hint {
+  margin: 6px 0 0;
+  font-size: 13px;
+  color: var(--muted);
+}
 .feedback .explain {
   margin-top: 6px;
   font-family: var(--font-body);

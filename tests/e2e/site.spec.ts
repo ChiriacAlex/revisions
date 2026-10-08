@@ -59,3 +59,14 @@ test("le labo Python charge Python et lance les tests officiels", async ({ page 
   await page.getByRole("button", { name: "▶ Lancer les tests" }).click();
   await expect(page.locator(".pylab-status").first()).toContainText("1/60 tests réussis", { timeout: 60_000 });
 });
+
+test("une réponse numérique accepte fraction ou décimal, et la solution s'affiche lisiblement", async ({ page }) => {
+  await page.goto("/courses/proba/variables-discretes/");
+  const quiz = page.locator('[data-item="pd-repartition"]');
+  await quiz.scrollIntoViewIfNeeded();
+  await quiz.getByRole("button", { name: "Je bloque" }).click();
+  await expect(quiz.locator(".feedback.reveal")).toContainText("Solution : 1/6 ≈ 0,167");
+  await quiz.getByLabel("Ta réponse").fill("0.1666666666666666");
+  await quiz.getByRole("button", { name: "Vérifier" }).click();
+  await expect(quiz.locator(".feedback.ok")).toContainText("Exact.");
+});
